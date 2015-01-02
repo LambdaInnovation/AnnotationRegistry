@@ -33,6 +33,7 @@ public class CommandRegistration extends RegistryType {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		//Return false to allow registration when the server is started again.
 		return false;
 	}
 

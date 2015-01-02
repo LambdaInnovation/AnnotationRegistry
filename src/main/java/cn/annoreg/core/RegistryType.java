@@ -80,6 +80,7 @@ public abstract class RegistryType {
 			}
 		}
 	}
+	
 	/**
 	 * Return true to remove the data from list. 
 	 * (For Command, reg is done each time the server is started, so can not always remove.)

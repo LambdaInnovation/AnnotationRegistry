@@ -1,16 +1,24 @@
 package cn.annoreg.core;
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.ModContainer;
+
 public class RegModInformation {
+	
+	private String modid;
 	private String pkg, prefix, res;
+	/**
+	 * Cached mod instance.
+	 */
+	private Object mod;
 	
-	private RegModInformation(String pkg, String prefix, String res) {
-		this.pkg = pkg;
-		this.prefix = prefix;
-		this.res = res;
-	}
-	
-	public RegModInformation(RegistrationMod mod) {
-		this(mod.pkg(), mod.prefix(), mod.res());
+	public RegModInformation(Class<?> clazz) {
+		RegistrationMod mod = clazz.getAnnotation(RegistrationMod.class);
+		this.pkg = mod.pkg();
+		this.prefix = mod.prefix();
+		this.res = mod.res();
+		modid = clazz.getAnnotation(Mod.class).modid();
 	}
 
 	public String getPackage() {
@@ -23,5 +31,16 @@ public class RegModInformation {
 	
 	public String getRes() {
 		return res + ":";
+	}
+	
+	public Object getModInstance() {
+		if (mod != null) return mod;
+		ModContainer mc = Loader.instance().getIndexedModList().get(modid);
+		if (mc != null) {
+			mod = mc.getMod();
+			return mod;
+		} else {
+			return null;
+		}
 	}
 }

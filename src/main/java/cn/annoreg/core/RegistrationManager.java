@@ -89,13 +89,12 @@ public class RegistrationManager {
 		if (modMap.containsKey(modClazz)) {
 			return modMap.get(modClazz);
 		} else {
-			RegistrationMod mod = modClazz.getAnnotation(RegistrationMod.class);
-			if (mod == null) {
+			if (!modClazz.isAnnotationPresent(RegistrationMod.class)) {
 				ARModContainer.log.error("Unable to create RegistryMod {}", modClazz.getCanonicalName());
 				return null;
 			}
 			
-			RegModInformation rm = new RegModInformation(mod);
+			RegModInformation rm = new RegModInformation(modClazz);
 			modMap.put(modClazz, rm);
 			return rm;
 		}
