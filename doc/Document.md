@@ -9,7 +9,7 @@ This mod is currently developed under Forge 1.7.2-10.12.2.1121.
 
 Setup
 ---
-In development environment, put the code files under src/main/java in your src/main/java folder or include them in your eclipse. To load the core plugin, put jar/AnnotationRegistry.jar into eclipse/mods.
+In development environment, put the code files under src/main/java in your src/main/java folder or include them in your eclipse. To load the core plugin, put jar/AnnotationRegistry.jar into eclipse/mods. The mod that uses AnnotationRegistry does not need to be coremod.
 
 Basic usage
 ---
@@ -21,7 +21,7 @@ To use the registry system, you need to follow these steps:
     ```
     This allow the registry system to identify all classes that belongs to this mod, and get some basic information for this mod.
 
-2. Find out the classes that contains the registration data (annotations on the class or its fields), use annotation ```@RegistrationClass``` on the class. This will make the registry system identify these classes at a very early stage of loading.
+2. Find out the classes that contains the registration data (annotations on the class, its fields, or its inner class), use annotation ```@RegistrationClass``` on the class. This will make the registry system identify these classes at a very early stage of loading (but do not really load them).
 
 3. Add Reg annotations (i.e. ```@RegBlock``` for blocks) on the class or its field(s).
 
@@ -42,6 +42,7 @@ Each RegistryType represents a kind of game objects in Minecraft, including:
 * EventHandler<br/>
     Forge and FML event handler. Use ```RegEventHandler``` on classes or public static fields.
 * MessageHandler<br/>
+    Network message handler. The mod must have a ```SimpleNetworkWrapper``` field (no matter static or not) with ```@RegMessageHandler.WrapperInstance``` on it. The registry system use IDs starting from 100, so the mod itself can also register IMessageHandler.
 * SubmoduleInit<br/>
     Submodule in the mod that have an ```init``` function to be called when the mod is loadded. Use ```RegSubmoduleInit``` on classes or public static fields.
 * Entity<br/>
