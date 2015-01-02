@@ -67,12 +67,12 @@ public abstract class RegistryType {
 			AnnotationData ad = itor.next();
 			switch (ad.type) {
 			case CLASS:
-				registerClass(ad);
-				itor.remove();
+				if (registerClass(ad))
+					itor.remove();
 				break;
 			case FIELD:
-				registerField(ad);
-				itor.remove();
+				if (registerField(ad))
+					itor.remove();
 				break;
 			default:
 				ARModContainer.log.error("Unknown registry data type.");
@@ -80,9 +80,14 @@ public abstract class RegistryType {
 			}
 		}
 	}
-	
-	public abstract void registerClass(AnnotationData data);
-	public abstract void registerField(AnnotationData data);
+	/**
+	 * Return true to remove the data from list. 
+	 * (For Command, reg is done each time the server is started, so can not always remove.)
+	 * @param data
+	 * @return
+	 */
+	public abstract boolean registerClass(AnnotationData data);
+	public abstract boolean registerField(AnnotationData data);
 	
 	public String getName() {
 		return name;

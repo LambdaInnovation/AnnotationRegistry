@@ -24,7 +24,6 @@ public class AnnoRegCorePlugin implements IFMLLoadingPlugin {
 
 	@Override
 	public void injectData(Map<String, Object> data) {
-		int i = 0;
 	}
 
 	@Override

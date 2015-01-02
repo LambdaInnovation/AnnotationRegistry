@@ -23,10 +23,6 @@ public class RegistrationManager {
 	private Map<Class<?>, RegistryMod> modMap = new HashMap();
 	private Set<RegistryMod> mods = new HashSet();
 	
-	private RegistrationManager() {
-		addRegType(new BlockRegistration());
-	}
-	
 	public void annotationList(Set<ASMData> data) {
 		for (ASMData asm : data) {
 			unloadedClass.add(asm.getClassName());
@@ -50,7 +46,7 @@ public class RegistrationManager {
 		
 		//Class annotations
 		for (Annotation anno : clazz.getAnnotations()) {
-			Class<? extends Annotation> annoclazz = anno.getClass();
+			Class<? extends Annotation> annoclazz = anno.annotationType();
 			if (regByClass.containsKey(annoclazz)) {
 				regByClass.get(annoclazz).visitClass(clazz);
 			}
@@ -77,6 +73,11 @@ public class RegistrationManager {
 	}
 	
 	public void addRegType(RegistryType type) {
+		if (regByClass.containsKey(type.getAnnotation()) ||
+				regByName.containsKey(type.getName())) {
+			ARModContainer.log.error("Unable to add the registry type {}.", type.getName());
+			return;
+		}
 		regByClass.put(type.getAnnotation(), type);
 		regByName.put(type.getName(), type);
 	}
@@ -119,5 +120,18 @@ public class RegistrationManager {
 	
 	public void registerAll(Object mod, String type) {
 		registerAll(createModFromObj(mod.getClass()), type);
+	}
+	
+	public void addRegistryTypes(Set<ASMData> data) {
+		for (ASMData asm : data) {
+			try {
+				Class<?> clazz = Class.forName(asm.getClassName());
+				RegistryType rt = (RegistryType) clazz.newInstance();
+				addRegType(rt);
+			} catch (Exception e) {
+				ARModContainer.log.error("Error on adding registry type {}.", asm.getClassName());
+				e.printStackTrace();
+			}
+		}
 	}
 }

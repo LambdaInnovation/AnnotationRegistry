@@ -8,9 +8,11 @@ import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cn.annoreg.core.AnnotationData;
 import cn.annoreg.core.RegistryType;
+import cn.annoreg.core.RegistryTypeDecl;
 import cn.annoreg.core.ctor.ConstructorUtils;
 import cn.annoreg.core.ctor.Ctor;
 
+@RegistryTypeDecl
 public class BlockRegistration extends RegistryType {
 
 	public BlockRegistration() {
@@ -18,12 +20,12 @@ public class BlockRegistration extends RegistryType {
 	}
 
 	@Override
-	public void registerClass(AnnotationData data) {
-		//Block must be used on field
+	public boolean registerClass(AnnotationData data) {
+		return false;
 	}
 
 	@Override
-	public void registerField(AnnotationData data) {
+	public boolean registerField(AnnotationData data) {
 		RegBlock anno = data.<RegBlock>getAnnotation();
 		Field field = data.getTheField();
 		Class<?> blockClass = field.getType();
@@ -45,6 +47,7 @@ public class BlockRegistration extends RegistryType {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return true;
 	}
 
 }
