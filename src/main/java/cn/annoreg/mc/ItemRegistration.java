@@ -35,35 +35,22 @@ public class ItemRegistration extends RegistryType {
 			name = field.getName();
 		}
 		Class<?> itemClass = field.getType();
-		try {
-			Item item = null;
-			if (field.isAnnotationPresent(Ctor.class)) {
-				item = (Item) ConstructorUtils.newInstance(itemClass, field.getAnnotation(Ctor.class));
-			} else {
-				item = (Item) itemClass.newInstance();
+		
+		Item item = (Item) ConstructorUtils.newInstance(field);
+		if (field.isAnnotationPresent(RegItem.UTName.class)) {
+			String utname = field.getAnnotation(RegItem.UTName.class).value();
+			if (utname.equals("")) {
+				utname = name;
 			}
-			if (item == null) {
-				ARModContainer.log.error("Can not create instance for item {}.", field.toString());
-				throw new RuntimeException();
-			}
-			if (field.isAnnotationPresent(RegItem.UTName.class)) {
-				String utname = field.getAnnotation(RegItem.UTName.class).value();
-				if (utname.equals("")) {
-					utname = name;
-				}
-				item.setUnlocalizedName(data.mod.getPrefix() + name);
-				item.setTextureName(data.mod.getRes() + name);
-			}
-			
-			field.set(null, item);
-			GameRegistry.registerItem(item, data.mod.getPrefix() + name);
-			
-			if (field.isAnnotationPresent(RegItem.OreDict.class)) {
-				RegItem.OreDict od = field.getAnnotation(RegItem.OreDict.class);
-				OreDictionary.registerOre(od.value(), item);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			item.setUnlocalizedName(data.mod.getPrefix() + name);
+			item.setTextureName(data.mod.getRes() + name);
+		}
+		
+		GameRegistry.registerItem(item, data.mod.getPrefix() + name);
+		
+		if (field.isAnnotationPresent(RegItem.OreDict.class)) {
+			RegItem.OreDict od = field.getAnnotation(RegItem.OreDict.class);
+			OreDictionary.registerOre(od.value(), item);
 		}
 		return true;
 	}

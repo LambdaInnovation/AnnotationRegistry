@@ -36,27 +36,13 @@ public class BlockRegistration extends RegistryType {
 		}
 		name = data.mod.getPrefix() + name;
 		Class<?> blockClass = field.getType();
-		try {
-			Block block;
-			if (field.isAnnotationPresent(Ctor.class)) {
-				block = (Block) ConstructorUtils.newInstance(blockClass, field.getAnnotation(Ctor.class));
-			} else {
-				block = (Block) blockClass.newInstance();
-			}
-			if (block == null) {
-				ARModContainer.log.error("Can not create instance for block {}.", field.toString());
-				throw new RuntimeException();
-			}
-			field.set(null, block);
-			GameRegistry.registerBlock(block, name);
-			
-			//oredict
-			if (field.isAnnotationPresent(RegBlock.OreDict.class)) {
-				RegBlock.OreDict od = field.getAnnotation(RegBlock.OreDict.class);
-				OreDictionary.registerOre(od.value(), block);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		Block block = (Block) ConstructorUtils.newInstance(field);
+		GameRegistry.registerBlock(block, name);
+		
+		//oredict
+		if (field.isAnnotationPresent(RegBlock.OreDict.class)) {
+			RegBlock.OreDict od = field.getAnnotation(RegBlock.OreDict.class);
+			OreDictionary.registerOre(od.value(), block);
 		}
 		return true;
 	}
