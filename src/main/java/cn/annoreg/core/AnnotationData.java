@@ -11,6 +11,7 @@ public class AnnotationData {
 	public final Type type;
 	public final Annotation anno;
 	public final Object reflect;
+	public RegModInformation mod;
 	
 	public AnnotationData(Annotation anno, Class<?> clazz) {
 		this.anno = anno;

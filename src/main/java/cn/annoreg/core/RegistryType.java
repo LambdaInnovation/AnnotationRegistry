@@ -3,16 +3,16 @@ package cn.annoreg.core;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import cn.annoreg.ARModContainer;
 
 public abstract class RegistryType {
-	protected Map<RegistryMod, Set<AnnotationData>> data = new HashMap();
-	protected Set<AnnotationData> unknownData = new HashSet();
+	protected Map<RegModInformation, List<AnnotationData>> data = new HashMap();
+	protected List<AnnotationData> unknownData = new LinkedList();
 	
 	private Class<? extends Annotation> annoClass;
 	private String name;
@@ -23,9 +23,9 @@ public abstract class RegistryType {
 	}
 	
 	private void newData(AnnotationData anno) {
-		RegistryMod mod = RegistrationManager.INSTANCE.findMod(anno);
+		RegModInformation mod = RegistrationManager.INSTANCE.findMod(anno);
 		if (mod != null) {
-			if (!data.containsKey(mod)) data.put(mod, new HashSet());
+			if (!data.containsKey(mod)) data.put(mod, new LinkedList());
 			data.get(mod).add(anno);
 		} else {
 			unknownData.add(anno);
@@ -46,14 +46,14 @@ public abstract class RegistryType {
 		}
 	}
 	
-	public void registerAll(RegistryMod mod) {
+	public void registerAll(RegModInformation mod) {
 		//First find if there's unknownData.
 		Iterator<AnnotationData> itor = unknownData.iterator();
 		while (itor.hasNext()) {
 			AnnotationData ad = itor.next();
-			RegistryMod rm = RegistrationManager.INSTANCE.findMod(ad);
+			RegModInformation rm = RegistrationManager.INSTANCE.findMod(ad);
 			if (rm != null) {
-				if (!data.containsKey(rm)) data.put(rm, new HashSet());
+				if (!data.containsKey(rm)) data.put(rm, new LinkedList());
 				data.get(rm).add(ad);
 				itor.remove();
 			}

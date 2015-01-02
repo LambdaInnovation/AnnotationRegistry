@@ -19,7 +19,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface RegBlock {
 	
-	String name();
+	/**
+	 * If not provided, the field name will be used.
+	 * @return
+	 */
+	String name() default "";
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)

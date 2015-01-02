@@ -56,6 +56,6 @@ public class ARModContainer extends DummyModContainer {
     	ASMDataTable dt = event.getASMHarvestedData();
     	RegistrationManager.INSTANCE.addRegistryTypes(dt.getAll("cn.annoreg.core.RegistryTypeDecl"));
     	RegistrationManager.INSTANCE.annotationList(dt.getAll("cn.annoreg.core.RegistrationClass"));
-    	RegistrationManager.INSTANCE.addAnnotationMod(dt.getAll("cn.annoreg.core.RegistrationPackage"));
+    	RegistrationManager.INSTANCE.addAnnotationMod(dt.getAll("cn.annoreg.core.RegistrationMod"));
     }
 }

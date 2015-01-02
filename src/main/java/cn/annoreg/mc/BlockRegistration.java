@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import net.minecraft.block.Block;
 import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cn.annoreg.ARModContainer;
 import cn.annoreg.core.AnnotationData;
 import cn.annoreg.core.RegistryType;
 import cn.annoreg.core.RegistryTypeDecl;
@@ -28,6 +29,12 @@ public class BlockRegistration extends RegistryType {
 	public boolean registerField(AnnotationData data) {
 		RegBlock anno = data.<RegBlock>getAnnotation();
 		Field field = data.getTheField();
+		String name = anno.name();
+		if (name.equals("")) {
+			//Use the field name if anno.name is blank (default).
+			name = field.getName();
+		}
+		name = data.mod.getPrefix() + name;
 		Class<?> blockClass = field.getType();
 		try {
 			Block block;
@@ -36,8 +43,12 @@ public class BlockRegistration extends RegistryType {
 			} else {
 				block = (Block) blockClass.newInstance();
 			}
+			if (block == null) {
+				ARModContainer.log.error("Can not create instance for block {}.", field.toString());
+				throw new RuntimeException();
+			}
 			field.set(null, block);
-			GameRegistry.registerBlock(block, anno.name());
+			GameRegistry.registerBlock(block, name);
 			
 			//oredict
 			if (field.isAnnotationPresent(RegBlock.OreDict.class)) {

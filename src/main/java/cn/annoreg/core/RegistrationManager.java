@@ -20,8 +20,8 @@ public class RegistrationManager {
 	private Map<Class<? extends Annotation>, RegistryType> regByClass = new HashMap();
 	private Map<String, RegistryType> regByName = new HashMap();
 	
-	private Map<Class<?>, RegistryMod> modMap = new HashMap();
-	private Set<RegistryMod> mods = new HashSet();
+	private Map<Class<?>, RegModInformation> modMap = new HashMap();
+	private Set<RegModInformation> mods = new HashSet();
 	
 	public void annotationList(Set<ASMData> data) {
 		for (ASMData asm : data) {
@@ -63,11 +63,14 @@ public class RegistrationManager {
 		}
 	}
 	
-	RegistryMod findMod(AnnotationData data) {
-		for (RegistryMod mod : mods) {
+	RegModInformation findMod(AnnotationData data) {
+		for (RegModInformation mod : mods) {
 			Class<?> clazz = data.type == AnnotationData.Type.CLASS ?
 					data.getTheClass() : data.getTheField().getDeclaringClass();
-			if (clazz.getCanonicalName().startsWith(mod.getPackage())) return mod;
+			if (clazz.getCanonicalName().startsWith(mod.getPackage())) {
+				data.mod = mod;
+				return mod;
+			}
 		}
 		return null;
 	}
@@ -82,22 +85,23 @@ public class RegistrationManager {
 		regByName.put(type.getName(), type);
 	}
 	
-	private RegistryMod createModFromObj(Class<?> modClazz) {
+	private RegModInformation createModFromObj(Class<?> modClazz) {
 		if (modMap.containsKey(modClazz)) {
 			return modMap.get(modClazz);
 		} else {
-			RegistrationPackage pkg = modClazz.getAnnotation(RegistrationPackage.class);
-			if (pkg == null) {
+			RegistrationMod mod = modClazz.getAnnotation(RegistrationMod.class);
+			if (mod == null) {
 				ARModContainer.log.error("Unable to create RegistryMod {}", modClazz.getCanonicalName());
 				return null;
 			}
-			RegistryMod rm = new RegistryMod(pkg.value());
+			
+			RegModInformation rm = new RegModInformation(mod);
 			modMap.put(modClazz, rm);
 			return rm;
 		}
 	}
 	
-	private void addMod(RegistryMod mod) {
+	private void addMod(RegModInformation mod) {
 		mods.add(mod);
 	}
 
@@ -112,10 +116,15 @@ public class RegistrationManager {
 		}
 	}
 	
-	private void registerAll(RegistryMod mod, String type) {
+	private void registerAll(RegModInformation mod, String type) {
 		//First load all classes that have not been loaded.
 		loadClasses();
-		regByName.get(type).registerAll(mod);
+		RegistryType rt = regByName.get(type);
+		if (rt == null) {
+			ARModContainer.log.fatal("RegistryType {} not found.", type);
+			throw new RuntimeException();
+		}
+		rt.registerAll(mod);
 	}
 	
 	public void registerAll(Object mod, String type) {

@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RegistrationPackage {
-	String value();
+public @interface RegistrationMod {
+	String pkg();
+	String res();
+	String prefix() default "";
 }
