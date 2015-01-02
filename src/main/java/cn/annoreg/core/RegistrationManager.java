@@ -61,6 +61,11 @@ public class RegistrationManager {
 				}
 			}
 		}
+		
+		//Inner classes
+		for (Class<?> inner : clazz.getClasses()) {
+			prepareClass(inner);
+		}
 	}
 	
 	RegModInformation findMod(AnnotationData data) {
