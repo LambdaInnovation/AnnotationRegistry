@@ -53,6 +53,7 @@ public class ARModContainer extends DummyModContainer {
 
     @Subscribe
     public void constructMod(FMLConstructionEvent event) {
+    	log.info("AnnotationRegistry is loading.");
     	ASMDataTable dt = event.getASMHarvestedData();
     	RegistrationManager.INSTANCE.addRegistryTypes(dt.getAll("cn.annoreg.core.RegistryTypeDecl"));
     	RegistrationManager.INSTANCE.annotationList(dt.getAll("cn.annoreg.core.RegistrationClass"));

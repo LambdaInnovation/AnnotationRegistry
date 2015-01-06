@@ -67,10 +67,12 @@ public abstract class RegistryType {
 			AnnotationData ad = itor.next();
 			switch (ad.type) {
 			case CLASS:
+				ARModContainer.log.info("Register class {}.", ad.getTheClass().getCanonicalName());
 				if (registerClass(ad))
 					itor.remove();
 				break;
 			case FIELD:
+				ARModContainer.log.info("Register field {}.", ad.getTheField().toString());
 				if (registerField(ad))
 					itor.remove();
 				break;

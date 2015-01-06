@@ -32,17 +32,17 @@ public class RegistrationManager {
 	private void loadClasses() {
 		for (String name : unloadedClass) {
 			try {
+				ARModContainer.log.info("Loading registration information on {}.", name);
 				prepareClass(Class.forName(name));
-			} catch (ClassNotFoundException e) {
-				ARModContainer.log.error("Error on loading class {}.", name);
-				e.printStackTrace();
+				ARModContainer.log.info("Loaded registration information on {}.", name);
+			} catch (Exception e) {
+				ARModContainer.log.warn("Error on loading class {}.", name);//TODO SideOnly class will all go here.
 			}
 		}
 		unloadedClass.clear();
 	}
 	
 	private void prepareClass(Class<?> clazz) {
-		ARModContainer.log.info("Loading registration information on {}.", clazz.getName());
 		
 		//Class annotations
 		for (Annotation anno : clazz.getAnnotations()) {
@@ -66,6 +66,7 @@ public class RegistrationManager {
 		for (Class<?> inner : clazz.getClasses()) {
 			prepareClass(inner);
 		}
+
 	}
 	
 	RegModInformation findMod(AnnotationData data) {
@@ -142,8 +143,7 @@ public class RegistrationManager {
 				RegistryType rt = (RegistryType) clazz.newInstance();
 				addRegType(rt);
 			} catch (Exception e) {
-				ARModContainer.log.error("Error on adding registry type {}.", asm.getClassName());
-				e.printStackTrace();
+				ARModContainer.log.warn("Error on adding registry type {}.", asm.getClassName()); //TODO side only type will go here
 			}
 		}
 	}
