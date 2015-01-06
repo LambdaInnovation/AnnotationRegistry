@@ -43,4 +43,8 @@ public class RegModInformation {
 			return null;
 		}
 	}
+	
+	public String getModID() {
+		return modid;
+	}
 }

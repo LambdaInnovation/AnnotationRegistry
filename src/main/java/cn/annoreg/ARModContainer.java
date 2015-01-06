@@ -26,6 +26,7 @@ import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
+import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
@@ -58,5 +59,11 @@ public class ARModContainer extends DummyModContainer {
     	RegistrationManager.INSTANCE.addRegistryTypes(dt.getAll("cn.annoreg.core.RegistryTypeDecl"));
     	RegistrationManager.INSTANCE.annotationList(dt.getAll("cn.annoreg.core.RegistrationClass"));
     	RegistrationManager.INSTANCE.addAnnotationMod(dt.getAll("cn.annoreg.core.RegistrationMod"));
+    }
+
+    @Subscribe
+    public void loadComplete(FMLLoadCompleteEvent event) {
+    	log.info("AnnotationRegistry is loaded. Checking states.");
+    	RegistrationManager.INSTANCE.checkLoadState();
     }
 }

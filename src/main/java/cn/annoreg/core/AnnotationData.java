@@ -44,4 +44,10 @@ public class AnnotationData {
 	public Field getTheField() {
 		return isField() ? (Field) reflect : null;
 	}
+	
+	@Override
+	public String toString() {
+		return "AnnotationData (" + anno.annotationType().getSimpleName() + ", " +
+				(isClass() ? getTheClass().getCanonicalName() : getTheField().toString()) + ")";
+	}
 }

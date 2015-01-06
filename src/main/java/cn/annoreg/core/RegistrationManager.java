@@ -32,9 +32,7 @@ public class RegistrationManager {
 	private void loadClasses() {
 		for (String name : unloadedClass) {
 			try {
-				ARModContainer.log.info("Loading registration information on {}.", name);
 				prepareClass(Class.forName(name));
-				ARModContainer.log.info("Loaded registration information on {}.", name);
 			} catch (Exception e) {
 				ARModContainer.log.warn("Error on loading class {}.", name);//TODO SideOnly class will all go here.
 			}
@@ -43,7 +41,6 @@ public class RegistrationManager {
 	}
 	
 	private void prepareClass(Class<?> clazz) {
-		
 		//Class annotations
 		for (Annotation anno : clazz.getAnnotations()) {
 			Class<? extends Annotation> annoclazz = anno.annotationType();
@@ -66,7 +63,6 @@ public class RegistrationManager {
 		for (Class<?> inner : clazz.getClasses()) {
 			prepareClass(inner);
 		}
-
 	}
 	
 	RegModInformation findMod(AnnotationData data) {
@@ -126,8 +122,9 @@ public class RegistrationManager {
 		loadClasses();
 		RegistryType rt = regByName.get(type);
 		if (rt == null) {
-			ARModContainer.log.fatal("RegistryType {} not found.", type);
-			throw new RuntimeException();
+			ARModContainer.log.error("RegistryType {} not found.", type);
+			//TODO side only type go here.
+			return;
 		}
 		rt.registerAll(mod);
 	}
@@ -156,5 +153,15 @@ public class RegistrationManager {
 				ARModContainer.log.error("Error on adding registry annotation {}.", asm.getClassName());
 			}
 		}
+	}
+	
+	public void checkLoadState() {
+		for (RegistryType rt : regByName.values()) {
+			rt.checkLoadState();
+		}
+	}
+	
+	public Set<RegModInformation> getMods() {
+		return mods;
 	}
 }

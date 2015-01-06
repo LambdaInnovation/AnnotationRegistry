@@ -42,4 +42,8 @@ public class CommandRegistration extends RegistryType {
 		return false;
 	}
 
+	@Override
+	public void checkLoadState() {
+		//Command is not loaded at the beginning.
+	}
 }

@@ -11,14 +11,7 @@ public class ConstructorUtils {
 	public static Object newInstance(Class<?> clazz) {
 		Object obj = null;
 		try {
-			if (clazz.isAnnotationPresent(Ctor.class)) {
-				obj = ConstructorUtils.newInstance(clazz, clazz.getAnnotation(Ctor.class));
-				if (obj == null) {
-					throw new RuntimeException("No constructor found.");
-				}
-			} else {
-				obj = clazz.newInstance();
-			}
+			obj = ConstructorUtils.newInstance(clazz, clazz.getAnnotation(Ctor.class));
 		} catch (Exception e) {
 			ARModContainer.log.error("Can not create instance for class {}.", clazz.getCanonicalName());
 			throw new RuntimeException(e);
@@ -34,14 +27,7 @@ public class ConstructorUtils {
 				//No need to create new instance.
 				return ret;
 			}
-			if (field.isAnnotationPresent(Ctor.class)) {
-				ret = newInstance(field.getType(), field.getAnnotation(Ctor.class));
-			} else {
-				ret = field.getType().newInstance();
-				if (ret == null) {
-					throw new RuntimeException("No constructor found.");
-				}
-			}
+			ret = newInstance(field.getType(), field.getAnnotation(Ctor.class));
 			field.set(null, ret);
 		} catch (Exception e) {
 			ARModContainer.log.error("Can not create instance for field {}.", field.toString());
@@ -51,14 +37,20 @@ public class ConstructorUtils {
 	}
 	
 	public static Object newInstance(Class<?> clazz, Ctor ctor) {
+		if (ctor == null) {
+			try {
+				return clazz.newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException("Unable to create object.", e);
+			}
+		}
 		for (Constructor c : clazz.getConstructors()) {
 			if (c.isAnnotationPresent(Constructible.class)) {
 				try {
 					Object result = callConstructor(c, ctor);
-					if (result == null)
+					if (result == null) {
 						throw new RuntimeException("Unable to create object.");
-					else {
-						ARModContainer.log.info("Successfully create the object.");
+					} else {
 						return result;
 					}
 				} catch (Exception e) {
@@ -66,7 +58,7 @@ public class ConstructorUtils {
 				}
 			}
 		}
-		return null;
+		throw new RuntimeException("Unable to create object. No Constructible constructor.");
 	}
 	
 	private static Object callConstructor(Constructor ctor, Ctor anno) throws Exception {
