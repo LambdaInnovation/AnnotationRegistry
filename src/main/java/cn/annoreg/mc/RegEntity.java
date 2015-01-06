@@ -13,4 +13,11 @@ public @interface RegEntity {
 	int trackRange() default 32;
 	int freq() default 3;
 	boolean updateVel() default true;
+	
+	/**
+	 * Field name of the renderer instance.
+	 * A field of the Entity class.
+	 * @return
+	 */
+	String renderName() default "";
 }

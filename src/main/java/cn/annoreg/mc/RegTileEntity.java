@@ -13,4 +13,11 @@ public @interface RegTileEntity {
 	 * @return
 	 */
 	String name() default "";
+
+	/**
+	 * Field name of the renderer instance.
+	 * A field of the TileEntity class.
+	 * @return
+	 */
+	String renderName() default "";
 }

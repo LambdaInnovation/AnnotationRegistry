@@ -52,7 +52,24 @@ public class ItemRegistration extends RegistryType {
 			RegItem.OreDict od = field.getAnnotation(RegItem.OreDict.class);
 			OreDictionary.registerOre(od.value(), item);
 		}
+		
+		if (ClientRegistryHelper.isClient() && !anno.renderName().equals("")) {
+			ClientRegistryHelper.regItemRender(item, getRenderer(field.getDeclaringClass(), itemClass, anno.renderName()));
+		}
 		return true;
 	}
 
+	private Object getRenderer(Class<?> clazz1, Class<?> clazz2, String name) {
+		for (Field field : clazz1.getFields()) {
+			if (field.getName().equals(name)) {
+				return ConstructorUtils.newInstance(field);
+			}
+		}
+		for (Field field : clazz2.getFields()) {
+			if (field.getName().equals(name)) {
+				return ConstructorUtils.newInstance(field);
+			}
+		}
+		throw new RuntimeException("Render field not found.");
+	}
 }

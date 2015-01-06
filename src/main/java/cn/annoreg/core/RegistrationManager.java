@@ -147,4 +147,14 @@ public class RegistrationManager {
 			}
 		}
 	}
+	
+	public void addSideOnlyRegAnnotation(Set<ASMData> data) {
+		for (ASMData asm : data) {
+			try {
+				Class<?> clazz = Class.forName(asm.getClassName());
+			} catch (Exception e) {
+				ARModContainer.log.error("Error on adding registry annotation {}.", asm.getClassName());
+			}
+		}
+	}
 }

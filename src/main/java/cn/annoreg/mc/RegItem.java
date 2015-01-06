@@ -17,6 +17,14 @@ public @interface RegItem {
 	String name() default "";
 	
 	/**
+	 * Field name of the renderer instance.
+	 * A field of the Item class or a field of 
+	 * the RegistrationClass containing this annotation.
+	 * @return
+	 */
+	String renderName() default "";
+	
+	/**
 	 * Add this annotation to set unlocalized name and texture name.
 	 * tname is set to mod.res (+ ":") + value.
 	 * uname is set to mod.prefix + value.
