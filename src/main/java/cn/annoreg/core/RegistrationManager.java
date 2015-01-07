@@ -34,7 +34,9 @@ public class RegistrationManager {
 			try {
 				prepareClass(Class.forName(name));
 			} catch (Exception e) {
-				ARModContainer.log.warn("Error on loading class {}.", name);//TODO SideOnly class will all go here.
+				ARModContainer.log.warn("Can not loading class {}, maybe a SideOnly class.", name);
+			} catch (Throwable e) {
+				ARModContainer.log.fatal("Error on loading class {}. Please check the implementation.", name);
 			}
 		}
 		unloadedClass.clear();

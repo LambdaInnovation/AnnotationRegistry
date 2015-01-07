@@ -48,8 +48,11 @@ public class EntityRegistration extends RegistryType {
 			name = clazz.getSimpleName();
 		}
 		name = data.mod.getPrefix() + name;
-		EntityRegistry.registerModEntity(clazz, name, getID(mod), mod, 
-				anno.trackRange(), anno.freq(), anno.updateVel());
+		
+		if (!anno.clientOnly()) {
+			EntityRegistry.registerModEntity(clazz, name, getID(mod), mod, 
+					anno.trackRange(), anno.freq(), anno.updateVel());
+		}
 		
 		if (ClientRegistryHelper.isClient() && !anno.renderName().equals("")) {
 			ClientRegistryHelper.regEntityRender(clazz, getRenderer(clazz, anno.renderName()));

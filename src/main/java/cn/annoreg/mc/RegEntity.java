@@ -13,6 +13,7 @@ public @interface RegEntity {
 	int trackRange() default 32;
 	int freq() default 3;
 	boolean updateVel() default true;
+	boolean clientOnly() default false;
 	
 	/**
 	 * Field name of the renderer instance.
