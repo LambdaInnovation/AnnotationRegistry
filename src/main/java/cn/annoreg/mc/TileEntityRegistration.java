@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import net.minecraft.tileentity.TileEntity;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cn.annoreg.base.RegistrationClassSimple;
+import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 import cn.annoreg.mc.RegTileEntity.HasRender;
@@ -15,6 +16,7 @@ public class TileEntityRegistration extends RegistrationClassSimple<RegTileEntit
 
 	public TileEntityRegistration() {
 		super(RegTileEntity.class, "TileEntity");
+		this.setLoadStage(LoadStage.INIT);
 		
 		this.addWork(HasRender.class, new PostWork<HasRender, Class<? extends TileEntity>>() {
 			@Override

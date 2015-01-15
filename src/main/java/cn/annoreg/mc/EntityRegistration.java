@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.annoreg.base.RegistrationClassSimple;
+import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 import cn.annoreg.mc.RegEntity.HasRender;
@@ -18,6 +19,8 @@ public class EntityRegistration extends RegistrationClassSimple<RegEntity, Entit
 
 	public EntityRegistration() {
 		super(RegEntity.class, "Entity");
+		this.setLoadStage(LoadStage.INIT);
+		
 		this.addWork(RegEntity.HasRender.class, new PostWork<RegEntity.HasRender, Class<? extends Entity>>() {
 			@Override
 			public void invoke(HasRender anno, Class<? extends Entity> obj) throws Exception {

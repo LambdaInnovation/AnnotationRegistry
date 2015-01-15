@@ -77,7 +77,7 @@ public class RegistryHelper {
 					throw new RuntimeException("The field must be static.");
 				}
 				try {
-					Object ret = field.get(null);
+					Object ret = field.get(null);//TODO should not use null
 					if (ret == null) {
 						ret = field.getType().newInstance();
 						field.set(null, ret);

@@ -11,6 +11,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import cn.annoreg.base.RegistrationClassSimple;
+import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 
@@ -19,6 +20,8 @@ public class MessageHandlerRegistration extends RegistrationClassSimple<RegMessa
 	
 	public MessageHandlerRegistration() {
 		super(RegMessageHandler.class, "MessageHandler");
+		this.setLoadStage(LoadStage.INIT);
+		
 		//Set this annotation to prepare for calling getModField.
 		helper.setModFieldAnnotation(RegMessageHandler.WrapperInstance.class);
 	}

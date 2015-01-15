@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.annoreg.ARModContainer;
+import cn.annoreg.base.RegistrationEmpty;
 import cn.annoreg.mc.BlockRegistration;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 
@@ -87,13 +88,23 @@ public class RegistrationManager {
 	}
 	
 	public void addRegType(RegistryType type) {
-		if (regByClass.containsKey(type.annoClass) ||
-				regByName.containsKey(type.name)) {
-			ARModContainer.log.error("Unable to add the registry type {}.", type.name);
-			return;
+		if (type.annoClass == null) {
+			if (regByName.containsKey(type.name)) {
+				ARModContainer.log.error("Unable to add the registry type {}.", type.name);
+				Thread.dumpStack();
+				return;
+			}
+			regByName.put(type.name, type);
+		} else {
+			if (regByClass.containsKey(type.annoClass) ||
+					regByName.containsKey(type.name)) {
+				ARModContainer.log.error("Unable to add the registry type {}.", type.name);
+				Thread.dumpStack();
+				return;
+			}
+			regByClass.put(type.annoClass, type);
+			regByName.put(type.name, type);
 		}
-		regByClass.put(type.annoClass, type);
-		regByName.put(type.name, type);
 	}
 	
 	private RegModInformation createModFromObj(Class<?> modClazz) {
@@ -172,5 +183,15 @@ public class RegistrationManager {
 	
 	public Set<RegModInformation> getMods() {
 		return mods;
+	}
+	
+	public void addDependencyFor(String type, String dep) {
+		regByName.get(type).addDependency(dep);
+	}
+	
+	static {
+		for (LoadStage ls : LoadStage.values()) {
+			INSTANCE.addRegType(new RegistrationEmpty(ls.name));
+		}
 	}
 }

@@ -6,6 +6,7 @@ import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommand;
 import net.minecraft.server.MinecraftServer;
 import cn.annoreg.base.RegistrationClassRepeat;
+import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 
@@ -14,6 +15,7 @@ public class CommandRegistration extends RegistrationClassRepeat<RegCommand, ICo
 
 	public CommandRegistration() {
 		super(RegCommand.class, "Command");
+		this.setLoadStage(LoadStage.START_SERVER);
 	}
 
 	@Override

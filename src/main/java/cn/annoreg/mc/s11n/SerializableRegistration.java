@@ -1,6 +1,7 @@
 package cn.annoreg.mc.s11n;
 
 import cn.annoreg.base.RegistrationClassSimple;
+import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegistryTypeDecl;
 
 @RegistryTypeDecl
@@ -8,6 +9,7 @@ public class SerializableRegistration extends RegistrationClassSimple<RegSeriali
 
 	public SerializableRegistration() {
 		super(RegSerializable.class, "Serializable");
+		this.setLoadStage(LoadStage.INIT);
 	}
 
 	@Override

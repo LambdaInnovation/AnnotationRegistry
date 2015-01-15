@@ -25,12 +25,25 @@ public abstract class RegistryType {
 	public final String name;
 	
 	private Set<RegModInformation> loadedMods = new HashSet();
+	private Set<String> dependencies = new HashSet();
 	
 	public RegistryHelper helper = new RegistryHelper(this);
 	
 	public RegistryType(Class<? extends Annotation> annoClass, String name) {
 		this.annoClass = annoClass;
 		this.name = name;
+	}
+	
+	public RegistryType(String name) {
+		this(null, name);
+	}
+	
+	public void addDependency(String dep) {
+		dependencies.add(dep);
+	}
+	
+	protected void setLoadStage(LoadStage stage) {
+		RegistrationManager.INSTANCE.addDependencyFor(stage.name, this.name);
 	}
 	
 	private void newData(AnnotationData anno) {
@@ -58,6 +71,11 @@ public abstract class RegistryType {
 	}
 	
 	public void registerAll(RegModInformation mod) {
+		//Dependencies.
+		for (String dep : dependencies) {
+			RegistrationManager.INSTANCE.registerAll(mod.getModInstance(), dep);
+		}
+		
 		loadedMods.add(mod);
 		
 		//First find if there's unknownData.

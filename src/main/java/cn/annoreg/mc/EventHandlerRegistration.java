@@ -7,6 +7,7 @@ import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventBus;
 import cn.annoreg.base.RegistrationInstance;
+import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 
@@ -15,6 +16,7 @@ public class EventHandlerRegistration extends RegistrationInstance<RegEventHandl
 
 	public EventHandlerRegistration() {
 		super(RegEventHandler.class, "EventHandler");
+		this.setLoadStage(LoadStage.INIT);
 	}
 	
 	@Override

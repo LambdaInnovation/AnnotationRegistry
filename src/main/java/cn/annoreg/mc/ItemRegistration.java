@@ -7,6 +7,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.Item;
 import net.minecraftforge.oredict.OreDictionary;
 import cn.annoreg.base.RegistrationFieldSimple;
+import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 
@@ -15,6 +16,7 @@ public class ItemRegistration extends RegistrationFieldSimple<RegItem, Item> {
 
 	public ItemRegistration() {
 		super(RegItem.class, "Item");
+		this.setLoadStage(LoadStage.INIT);
 		
 		this.addWork(RegItem.OreDict.class, new PostWork<RegItem.OreDict, Item>() {
 			@Override

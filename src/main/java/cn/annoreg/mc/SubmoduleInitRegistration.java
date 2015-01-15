@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cn.annoreg.base.RegistrationClassOrField;
+import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 
@@ -15,6 +16,7 @@ public class SubmoduleInitRegistration extends RegistrationClassOrField<RegSubmo
 
 	public SubmoduleInitRegistration() {
 		super(RegSubmoduleInit.class, "SubmoduleInit");
+		this.setLoadStage(LoadStage.INIT);
 	}
 	
 	private boolean onSide(RegSubmoduleInit anno) {

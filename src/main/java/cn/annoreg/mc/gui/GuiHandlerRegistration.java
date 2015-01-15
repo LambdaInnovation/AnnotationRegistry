@@ -15,6 +15,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cn.annoreg.ARModContainer;
 import cn.annoreg.base.RegistrationFieldSimple;
 import cn.annoreg.core.AnnotationData;
+import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 
@@ -23,6 +24,7 @@ public class GuiHandlerRegistration extends RegistrationFieldSimple<RegGuiHandle
 
 	public GuiHandlerRegistration() {
 		super(RegGuiHandler.class, "GuiHandler");
+		this.setLoadStage(LoadStage.INIT);
 	}
 
 	private static class ModGuiHandler implements IGuiHandler {

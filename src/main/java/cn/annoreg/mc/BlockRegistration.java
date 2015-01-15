@@ -1,6 +1,7 @@
 package cn.annoreg.mc;
 
 import cn.annoreg.base.RegistrationFieldSimple;
+import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 import net.minecraft.block.Block;
@@ -12,6 +13,7 @@ public class BlockRegistration extends RegistrationFieldSimple<RegBlock, Block> 
 
 	public BlockRegistration() {
 		super(RegBlock.class, "Block");
+		this.setLoadStage(LoadStage.INIT);
 		
 		this.addWork(RegBlock.OreDict.class, new PostWork<RegBlock.OreDict, Block>() {
 			@Override
