@@ -6,36 +6,19 @@ import java.lang.reflect.Field;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventBus;
-import cn.annoreg.core.AnnotationData;
-import cn.annoreg.core.RegistryType;
+import cn.annoreg.base.RegistrationInstance;
+import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
-import cn.annoreg.core.ctor.ConstructorUtils;
-import cn.annoreg.core.ctor.Ctor;
 
 @RegistryTypeDecl
-public class EventHandlerRegistration extends RegistryType {
+public class EventHandlerRegistration extends RegistrationInstance<RegEventHandler, Object> {
 
 	public EventHandlerRegistration() {
 		super(RegEventHandler.class, "EventHandler");
 	}
-
+	
 	@Override
-	public boolean registerClass(AnnotationData data) {
-		Class<?> clazz = data.getTheClass();
-		Object obj = ConstructorUtils.newInstance(clazz);
-		register(data.<RegEventHandler>getAnnotation(), obj);
-		return true;
-	}
-
-	@Override
-	public boolean registerField(AnnotationData data) {
-		Field field = data.getTheField();
-		Object obj = ConstructorUtils.newInstance(field);
-		register(data.<RegEventHandler>getAnnotation(), obj);
-		return true;
-	}
-
-	private void register(RegEventHandler anno, Object obj) {
+	protected void register(Object obj, RegEventHandler anno) throws Exception {
 		for (RegEventHandler.Bus bus : anno.value()) {
 			switch (bus) {
 			case FML:
@@ -48,4 +31,5 @@ public class EventHandlerRegistration extends RegistryType {
 			}
 		}
 	}
+	
 }

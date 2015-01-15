@@ -16,6 +16,7 @@ public class RegistrationManager {
 	public static final RegistrationManager INSTANCE = new RegistrationManager();
 	
 	private Set<String> unloadedClass = new HashSet();
+	private Set<Class<?>> loadedClass = new HashSet();
 	
 	private Map<Class<? extends Annotation>, RegistryType> regByClass = new HashMap();
 	private Map<String, RegistryType> regByName = new HashMap();
@@ -43,6 +44,12 @@ public class RegistrationManager {
 	}
 	
 	private void prepareClass(Class<?> clazz) {
+		//First check loadedClass to avoid infinite recursion (when extending the enclosing class).
+		if (loadedClass.contains(clazz)) {
+			return;
+		}
+		loadedClass.add(clazz);
+		
 		//Class annotations
 		for (Annotation anno : clazz.getAnnotations()) {
 			Class<? extends Annotation> annoclazz = anno.annotationType();
@@ -62,7 +69,7 @@ public class RegistrationManager {
 		}
 		
 		//Inner classes
-		for (Class<?> inner : clazz.getClasses()) {
+		for (Class<?> inner : clazz.getDeclaredClasses()) {
 			prepareClass(inner);
 		}
 	}
@@ -80,13 +87,13 @@ public class RegistrationManager {
 	}
 	
 	public void addRegType(RegistryType type) {
-		if (regByClass.containsKey(type.getAnnotation()) ||
-				regByName.containsKey(type.getName())) {
-			ARModContainer.log.error("Unable to add the registry type {}.", type.getName());
+		if (regByClass.containsKey(type.annoClass) ||
+				regByName.containsKey(type.name)) {
+			ARModContainer.log.error("Unable to add the registry type {}.", type.name);
 			return;
 		}
-		regByClass.put(type.getAnnotation(), type);
-		regByName.put(type.getName(), type);
+		regByClass.put(type.annoClass, type);
+		regByName.put(type.name, type);
 	}
 	
 	private RegModInformation createModFromObj(Class<?> modClazz) {

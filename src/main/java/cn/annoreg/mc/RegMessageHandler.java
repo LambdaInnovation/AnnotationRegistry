@@ -8,11 +8,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RegMessageHandler {
-	
 	public enum Side {
 		SERVER,
 		CLIENT,
-		BOTH,
 	}
 	
 	Class<?> msg();

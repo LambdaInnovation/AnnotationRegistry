@@ -29,8 +29,8 @@ public class RegModInformation {
 		return prefix;
 	}
 	
-	public String getRes() {
-		return res + ":";
+	public String getRes(String id) {
+		return res + ":" + id;
 	}
 	
 	public Object getModInstance() {

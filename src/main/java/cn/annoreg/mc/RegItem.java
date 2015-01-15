@@ -8,21 +8,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface RegItem {
-	/**
-	 * The name used in registry.
-	 * If not given (""), use the field name.
-	 * When registered, the real name used is mod.prefix + name.
-	 * @return
-	 */
-	String name() default "";
-	
-	/**
-	 * Field name of the renderer instance.
-	 * A field of the Item class or a field of 
-	 * the RegistrationClass containing this annotation.
-	 * @return
-	 */
-	String renderName() default "";
 	
 	/**
 	 * Add this annotation to set unlocalized name and texture name.
@@ -35,7 +20,7 @@ public @interface RegItem {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
 	public @interface UTName {
-		String value() default "";
+		String value();
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -43,4 +28,12 @@ public @interface RegItem {
 	public @interface OreDict {
 		String value();
 	}
+	
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.FIELD)
+	public @interface HasRender {}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.FIELD)
+	public @interface Render {}
 }

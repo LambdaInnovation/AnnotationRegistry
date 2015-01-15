@@ -8,17 +8,19 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RegEntity {
-	String name() default "";
 	
 	int trackRange() default 32;
 	int freq() default 3;
 	boolean updateVel() default true;
 	boolean clientOnly() default false;
 	
-	/**
-	 * Field name of the renderer instance.
-	 * A field of the Entity class.
-	 * @return
-	 */
-	String renderName() default "";
+	
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	public @interface HasRender {}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.FIELD)
+	public @interface Render {}
+	
 }

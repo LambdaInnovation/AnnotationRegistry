@@ -2,6 +2,7 @@ package cn.annoreg.core;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,30 +18,15 @@ import cn.annoreg.core.AnnotationData.Type;
 
 public abstract class RegistryType {
 	
-	private static class RegDataCmp implements Comparator<AnnotationData> {
-		
-		public static final RegDataCmp INSTANCE = new RegDataCmp();
-		
-		@Override
-		public int compare(AnnotationData arg0, AnnotationData arg1) {
-			if (arg0.type != arg1.type) {
-				return arg0.type.compareTo(arg1.type);
-			} else if (arg0.type == Type.CLASS) {
-				return arg0.getTheClass().getCanonicalName().compareTo(arg1.getTheClass().getCanonicalName());
-			} else {
-				return arg0.getTheField().toString().compareTo(arg1.getTheField().toString());
-			}
-		}
-		
-	}
+	private Map<RegModInformation, List<AnnotationData>> data = new HashMap();
+	private List<AnnotationData> unknownData = new LinkedList();
 	
-	protected Map<RegModInformation, List<AnnotationData>> data = new HashMap();
-	protected List<AnnotationData> unknownData = new LinkedList();
-	
-	private Class<? extends Annotation> annoClass;
-	private String name;
+	public final Class<? extends Annotation> annoClass;
+	public final String name;
 	
 	private Set<RegModInformation> loadedMods = new HashSet();
+	
+	public RegistryHelper helper = new RegistryHelper(this);
 	
 	public RegistryType(Class<? extends Annotation> annoClass, String name) {
 		this.annoClass = annoClass;
@@ -86,17 +72,38 @@ public abstract class RegistryType {
 			}
 		}
 		
-		//Do registration
 		if (!data.containsKey(mod))	return;
 		
+		//Sort
 		List<AnnotationData> regList = data.get(mod);
-		Collections.sort(regList, RegDataCmp.INSTANCE);
+		Collections.sort(regList, new Comparator<AnnotationData>() {
+			@Override
+			public int compare(AnnotationData arg0, AnnotationData arg1) {
+				if (arg0.type != arg1.type) {
+					return arg0.type.compareTo(arg1.type);
+				} else if (arg0.type == Type.CLASS) {
+					return arg0.getTheClass().getCanonicalName().compareTo(arg1.getTheClass().getCanonicalName());
+				} else {
+					return arg0.getTheField().toString().compareTo(arg1.getTheField().toString());
+				}
+			}
+		});
+
+		//Do registration
+		String entryPrefix = mod.getPrefix() + this.name + "_";
+		this.currentMod = mod;
 		
 		itor = regList.iterator();
 		while (itor.hasNext()) {
 			AnnotationData ad = itor.next();
 			switch (ad.type) {
 			case CLASS:
+				Class<?> theClass = ad.getTheClass();
+				if (theClass.isAnnotationPresent(RegWithName.class)) {
+					this.currentSuggestedName = theClass.getAnnotation(RegWithName.class).value();
+				} else {
+					this.currentSuggestedName = entryPrefix + ad.getTheClass().getSimpleName();
+				}
 				try {
 					if (registerClass(ad))
 						itor.remove();
@@ -106,6 +113,12 @@ public abstract class RegistryType {
 				}
 				break;
 			case FIELD:
+				Field theField = ad.getTheField();
+				if (theField.isAnnotationPresent(RegWithName.class)) {
+					this.currentSuggestedName = theField.getAnnotation(RegWithName.class).value();
+				} else {
+					this.currentSuggestedName = entryPrefix + ad.getTheField().getName();
+				}
 				try {
 					if (registerField(ad))
 						itor.remove();
@@ -119,6 +132,9 @@ public abstract class RegistryType {
 				break;
 			}
 		}
+		
+		this.currentSuggestedName = null;
+		this.currentMod = null;
 	}
 	
 	/**
@@ -127,16 +143,8 @@ public abstract class RegistryType {
 	 * @param data
 	 * @return
 	 */
-	public abstract boolean registerClass(AnnotationData data);
-	public abstract boolean registerField(AnnotationData data);
-	
-	public String getName() {
-		return name;
-	}
-	
-	public Class<? extends Annotation> getAnnotation() {
-		return annoClass;
-	}
+	public abstract boolean registerClass(AnnotationData data) throws Exception;
+	public abstract boolean registerField(AnnotationData data) throws Exception;
 	
 	public void checkLoadState() {
 		for (RegModInformation mod : RegistrationManager.INSTANCE.getMods()) {
@@ -147,5 +155,17 @@ public abstract class RegistryType {
 				}
 			}
 		}
+	}
+	
+	private RegModInformation currentMod;
+	
+	public RegModInformation getCurrentMod() {
+		return currentMod;
+	}
+	
+	private String currentSuggestedName;
+	
+	protected String getSuggestedName() {
+		return currentSuggestedName;
 	}
 }

@@ -8,16 +8,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RegTileEntity {
-	/**
-	 * If blank, use mod.prefix + class.simpleName.
-	 * @return
-	 */
-	String name() default "";
+	
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	public @interface HasRender {}
 
-	/**
-	 * Field name of the renderer instance.
-	 * A field of the TileEntity class.
-	 * @return
-	 */
-	String renderName() default "";
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.FIELD)
+	public @interface Render {}
+	
 }

@@ -8,6 +8,11 @@ import org.objectweb.asm.Opcodes;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
+/**
+ * This class currently does nothing.
+ * @author acaly
+ *
+ */
 public class RegistryTransformer implements IClassTransformer {
 
 	@Override

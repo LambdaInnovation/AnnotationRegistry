@@ -14,5 +14,5 @@ public @interface RegEventHandler {
 		Forge,
 	}
 	
-	Bus[] value();
+	Bus[] value() default {Bus.FML, Bus.Forge};
 }
