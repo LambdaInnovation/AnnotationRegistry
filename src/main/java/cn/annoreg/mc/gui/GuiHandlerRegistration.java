@@ -13,42 +13,18 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cn.annoreg.ARModContainer;
+import cn.annoreg.base.RegistrationFieldSimple;
 import cn.annoreg.core.AnnotationData;
 import cn.annoreg.core.RegModInformation;
-import cn.annoreg.core.RegistryType;
 import cn.annoreg.core.RegistryTypeDecl;
 
 @RegistryTypeDecl
-public class GuiHandlerRegistration extends RegistryType {
+public class GuiHandlerRegistration extends RegistrationFieldSimple<RegGuiHandler, GuiHandlerBase> {
 
 	public GuiHandlerRegistration() {
 		super(RegGuiHandler.class, "GuiHandler");
 	}
 
-	@Override
-	public boolean registerClass(AnnotationData data) {
-		return false;
-	}
-
-	@Override
-	public boolean registerField(AnnotationData data) {
-		Field field = data.getTheField();
-		try {
-			if (!Modifier.isStatic(field.getModifiers()) || 
-					!GuiHandlerBase.class.isAssignableFrom(field.getType())) {
-				throw new RuntimeException("Invalid GuiHandler field.");
-			}
-			GuiHandlerBase handler = (GuiHandlerBase) field.get(null);
-			if (handler == null) {
-				throw new RuntimeException("Invalid GuiHandler field.");
-			}
-			regHandler(data.mod, handler);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return true;
-	}
-	
 	private static class ModGuiHandler implements IGuiHandler {
 
 		private List<IGuiHandler> subHandlers = new ArrayList();
@@ -88,6 +64,11 @@ public class GuiHandlerRegistration extends RegistryType {
 			NetworkRegistry.INSTANCE.registerGuiHandler(mod.getModInstance(), modHandler);
 		}
 		handler.register(mod.getModInstance(), modHandler.addHandler(handler.getHandler()));
+	}
+
+	@Override
+	protected void register(GuiHandlerBase value, RegGuiHandler anno, String field) throws Exception {
+		regHandler(this.getCurrentMod(), value);
 	}
 
 }
