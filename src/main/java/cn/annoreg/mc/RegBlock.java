@@ -15,4 +15,10 @@ public @interface RegBlock {
 		String value();
 	}
 	
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.FIELD)
+	public @interface BTName {
+		String value();
+	}
+	
 }
