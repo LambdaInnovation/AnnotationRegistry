@@ -4,9 +4,7 @@ import cn.annoreg.base.RegistrationFieldSimple;
 import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
-import cn.annoreg.core.RegistrationWithPostWork.PostWork;
 import net.minecraft.block.Block;
-import net.minecraft.item.Item;
 import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.common.registry.GameRegistry;
 
