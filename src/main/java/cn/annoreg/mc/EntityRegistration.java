@@ -26,6 +26,7 @@ public class EntityRegistration extends RegistrationClassSimple<RegEntity, Entit
 			public void invoke(HasRender anno, Class<? extends Entity> obj) throws Exception {
 				if (ProxyHelper.isClient()) {
 					ProxyHelper.regEntityRender(obj, helper.getFieldFromClass(obj, RegEntity.Render.class));
+					System.out.println("[AR]Registered render " + helper.getFieldFromClass(obj, RegEntity.Render.class) + "for " + obj);
 				}
 			}
 		});

@@ -39,6 +39,8 @@ public class RegistrationManager {
 				ARModContainer.log.warn("Can not loading class {}, maybe a SideOnly class.", name);
 			} catch (Throwable e) {
 				ARModContainer.log.fatal("Error on loading class {}. Please check the implementation.", name);
+				e.printStackTrace();
+				System.exit(-1);
 			}
 		}
 		unloadedClass.clear();
@@ -70,9 +72,15 @@ public class RegistrationManager {
 		}
 		
 		//Inner classes
+		// TODO: Currently, when reached @SideOnly(CLIENT) inner classes, this directly leads to crash.
+		// Is this a forge bug ?
 		for (Class<?> inner : clazz.getDeclaredClasses()) {
 			prepareClass(inner);
 		}
+		
+//		for (Class<?> inner : clazz.getClasses()) {
+//			prepareClass(inner);
+//		}
 	}
 	
 	RegModInformation findMod(AnnotationData data) {
