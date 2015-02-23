@@ -25,10 +25,17 @@ To use the registry system, you need to follow these steps:
 
 3. Add Reg annotations (i.e. ```@RegBlock``` for blocks) on the class or its field(s).
 
-4. Call ```registerAll``` function on ```RegistrationManager``` in the mod class, at the right time. For example, this is used in init stage of the mod, to register all blocks:
+4. [Deprecated] Call ```registerAll``` function on ```RegistrationManager``` in the mod class, at the right time. For example, this is used in init stage of the mod, to register all blocks:
     ```java
     RegistrationManager.INSTANCE.registerAll(this, "Block");
     ```
+
+5. Each ```RegistryType``` belongs to a registration stage. A list of stages available can be found in ```cn.annoreg.core.LoadStage```. Use LoadStage to register all RegisterType is recommended, like this:
+
+    ```java
+    RegistrationManager.INSTANCE.registerAll(this, "Init");
+    ```
+
 
 Registry types
 ---
@@ -58,8 +65,10 @@ New instance in registry
 ---
 For annotations that can be used on fields, sometimes new instance is created by registry system. 
 
-If the system needs an not-null object (which is usually the case), the system will try to create a new instance if the field has null value when the registration happens. The class used is always the Type of the field. The user has two choice: use the empty constructor, use ```@Ctor``` and ```@Constructible``` to choose which constructor to use. Note that in the first case, ```@Constructible``` is not required. In both cases, the constructor must be public so that the registry system has the access to it.
+If the system needs an not-null object (which is usually the case), the system will try to create a new instance if the field has null value when the registration happens. The class used is always the Type of the field, and the constructor used is always the one that takes no parameters. If such constructor does not exist, the registration failes. The user has two choice:
+* Use the empty constructor, which does not allow multiple instance with different settings (such as block's sub id).
+* Use an assignment directly on the field or in the static block, so that the system does not need to create the instance. In this case, an annonymous inner class is sometimes useful.
 
 New registry type
 ---
-In AnnotationRegistry, the core system and the implementation is separated. And it is also very easy for other mods to add new RegistryType. Use ```@RegistryTypeDecl``` on class implementating ```RegistryType```. Refer to classes in ```cn.annoreg.mc```.
+In AnnotationRegistry, the core system and the implementation is separated. And it is also very easy for other mods to add new RegistryType. Use ```@RegistryTypeDecl``` on class implementating one base class in package ```cn.annoreg.base```. Refer to classes in ```cn.annoreg.mc```.
