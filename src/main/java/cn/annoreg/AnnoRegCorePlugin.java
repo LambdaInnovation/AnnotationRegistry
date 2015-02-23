@@ -9,7 +9,7 @@ public class AnnoRegCorePlugin implements IFMLLoadingPlugin {
 	
 	@Override
 	public String[] getASMTransformerClass() {
-		return new String[] {};//{"cn.annoreg.asm.RegistryTransformer"};
+		return new String[] {"cn.annoreg.asm.RegistryTransformer"};
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,6 +26,8 @@ public class RegistrationManager {
 	private Map<Class<?>, RegModInformation> modMap = new HashMap();
 	private Set<RegModInformation> mods = new HashSet();
 	
+	private Map<String, List<String>> innerClassList = new HashMap();
+	
 	public void annotationList(Set<ASMData> data) {
 		for (ASMData asm : data) {
 			unloadedClass.add(asm.getClassName());
@@ -36,7 +39,7 @@ public class RegistrationManager {
 			try {
 				prepareClass(Class.forName(name));
 			} catch (Exception e) {
-				ARModContainer.log.warn("Can not loading class {}, maybe a SideOnly class.", name);
+				ARModContainer.log.warn("Can not load class {}, maybe a SideOnly class.", name);
 			} catch (Throwable e) {
 				ARModContainer.log.fatal("Error on loading class {}. Please check the implementation.", name);
 				e.printStackTrace();
@@ -72,15 +75,19 @@ public class RegistrationManager {
 		}
 		
 		//Inner classes
-		// TODO: Currently, when reached @SideOnly(CLIENT) inner classes, this directly leads to crash.
-		// Is this a forge bug ?
-		for (Class<?> inner : clazz.getDeclaredClasses()) {
-			prepareClass(inner);
+		if (innerClassList.containsKey(clazz.getName())) {
+		    for (String inner : innerClassList.get(clazz.getName())) {
+		        try {
+                    prepareClass(Class.forName(inner));
+	            } catch (Exception e) {
+	                ARModContainer.log.warn("Can not load class {}, maybe a SideOnly class.", inner);
+                } catch (Throwable e) {
+                    ARModContainer.log.fatal("Error on loading class {}. Please check the implementation.", inner);
+                    e.printStackTrace();
+                }
+		    }
 		}
 		
-//		for (Class<?> inner : clazz.getClasses()) {
-//			prepareClass(inner);
-//		}
 	}
 	
 	RegModInformation findMod(AnnotationData data) {
@@ -195,6 +202,14 @@ public class RegistrationManager {
 	
 	public void addDependencyFor(String type, String dep) {
 		regByName.get(type).addDependency(dep);
+	}
+	
+	public void addInnerClassList(String outer, List<String> inner) {
+	    if (innerClassList.containsKey(outer)) {
+	        innerClassList.get(outer).addAll(inner);
+	    } else {
+	        innerClassList.put(outer, inner);
+	    }
 	}
 	
 	static {
