@@ -42,7 +42,7 @@ public class ARModContainer extends DummyModContainer {
 		md.authorList = Lists.newArrayList("acaly");
 		md.modId = "AnnoReg";
 		md.name = "Annotation Registry";
-		md.version = "0.1";
+		md.version = "0.1alpha";
 	}
 	
     @Override

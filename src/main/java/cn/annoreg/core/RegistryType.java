@@ -127,6 +127,7 @@ public abstract class RegistryType {
 						itor.remove();
 				} catch (Exception e) {
 					ARModContainer.log.error("Error when registering {}.", ad.toString());
+					e.printStackTrace();
 					itor.remove();
 				}
 				break;
@@ -142,6 +143,7 @@ public abstract class RegistryType {
 						itor.remove();
 				} catch (Exception e) {
 					ARModContainer.log.error("Error when registering {}.", ad.toString());
+					e.printStackTrace();
 					itor.remove();
 				}
 				break;

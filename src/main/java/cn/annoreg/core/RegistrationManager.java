@@ -43,7 +43,6 @@ public class RegistrationManager {
 			} catch (Throwable e) {
 				ARModContainer.log.fatal("Error on loading class {}. Please check the implementation.", name);
 				e.printStackTrace();
-				System.exit(-1);
 			}
 		}
 		unloadedClass.clear();
