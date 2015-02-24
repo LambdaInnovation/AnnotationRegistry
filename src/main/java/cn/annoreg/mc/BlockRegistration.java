@@ -25,8 +25,8 @@ public class BlockRegistration extends RegistrationFieldSimple<RegBlock, Block> 
 		this.addWork(RegBlock.BTName.class, new PostWork<RegBlock.BTName, Block>() {
 			@Override
 			public void invoke(RegBlock.BTName anno, Block obj) throws Exception {
+				obj.setBlockName(getCurrentMod().getPrefix() + anno.value());
 				obj.setBlockTextureName(getCurrentMod().getRes(anno.value()));
-				obj.setBlockName(anno.value());
 			}
 		});
 		
