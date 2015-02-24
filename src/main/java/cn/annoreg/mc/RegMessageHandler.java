@@ -17,6 +17,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Register a IMessage, into its mod unique underlying SimpleNetworkWrapper. 
+ * It should be guaranteed that client and server mod have the exactly same message types&counts,
+ * so that AnnoReg can keep the discriminators ordered. Otherwise, using the annotation will cause
+ * inconsistent discriminators in client and server.
+ * @author WeathFolD, acaly
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RegMessageHandler {

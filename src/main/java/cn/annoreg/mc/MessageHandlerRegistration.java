@@ -41,7 +41,8 @@ public class MessageHandlerRegistration extends RegistrationClassSimple<RegMessa
 	private <REQ extends IMessage> void register(Class<?> handler, Class<REQ> msg, Side side) {
 		Class<? extends IMessageHandler<REQ, IMessage>> messageHandler = (Class<? extends IMessageHandler<REQ, IMessage>>) handler;
 		SimpleNetworkWrapper wrapper = (SimpleNetworkWrapper) helper.getModField();
-		wrapper.registerMessage(messageHandler, msg, helper.getNextIDForMod(), side);
+		int id = helper.getNextIDForMod();
+		wrapper.registerMessage(messageHandler, msg, id, side);
 	}
 	
 	@Override
