@@ -28,7 +28,7 @@ public class ItemRegistration extends RegistrationFieldSimple<RegItem, Item> {
 		this.addWork(RegItem.UTName.class, new PostWork<RegItem.UTName, Item>() {
 			@Override
 			public void invoke(RegItem.UTName anno, Item obj) throws Exception {
-				obj.setUnlocalizedName(getCurrentMod().getPrefix() + anno.value());
+				obj.setUnlocalizedName(anno.value());
 				obj.setTextureName(getCurrentMod().getRes(anno.value()));
 			}
 		});
