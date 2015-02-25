@@ -17,6 +17,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import net.minecraft.item.ItemBlock;
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface RegBlock {
@@ -32,5 +34,7 @@ public @interface RegBlock {
 	public @interface BTName {
 		String value();
 	}
+	
+	Class<? extends ItemBlock> item() default ItemBlock.class;
 	
 }

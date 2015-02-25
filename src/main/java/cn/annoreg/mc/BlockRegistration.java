@@ -46,7 +46,7 @@ public class BlockRegistration extends RegistrationFieldSimple<RegBlock, Block> 
 
 	@Override
 	protected void register(Block value, RegBlock anno, String field) throws Exception {
-		GameRegistry.registerBlock(value, getSuggestedName());
+		GameRegistry.registerBlock(value, anno.item(), getSuggestedName());
 	}
 
 }
