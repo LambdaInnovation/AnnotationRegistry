@@ -26,7 +26,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 @RegistryTypeDecl
 public class ChestContentRegistration extends RegistrationFieldSimple<RegChestContent, WeightedRandomChestContent> {
 	
-	public ChestContentRegistration(Class<RegChestContent> annoClass, String name) {
+	public ChestContentRegistration() {
 		super(RegChestContent.class, "ChestContent");
 		this.setLoadStage(LoadStage.INIT);
 	}
@@ -34,7 +34,6 @@ public class ChestContentRegistration extends RegistrationFieldSimple<RegChestCo
 	@Override
 	protected void register(WeightedRandomChestContent value, RegChestContent anno, String field) 
 			throws Exception {
-		System.err.println("CC reg");
 		for(int i : anno.value()) {
 			ChestGenHooks.addItem(type(i), value);
 		}
