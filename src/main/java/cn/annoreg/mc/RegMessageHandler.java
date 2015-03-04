@@ -35,6 +35,11 @@ public @interface RegMessageHandler {
 	Class<?> msg();
 	Side side();
 
+	/**
+	 * Populate this on a public static SimpleNetworkWrapper instance in your mod class,
+	 * and AR will record it and treat it as an internal registration source. You can 
+	 * later send messages registered using that SimpleNetworkWrapper.
+	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
 	public @interface WrapperInstance {}
