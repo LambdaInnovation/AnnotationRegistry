@@ -77,7 +77,9 @@ public class GuiHandlerRegistration extends RegistrationFieldSimple<RegGuiHandle
 			modHandlers.put(mod, modHandler);
 			NetworkRegistry.INSTANCE.registerGuiHandler(mod.getModInstance(), modHandler);
 		}
-		handler.register(mod.getModInstance(), modHandler.addHandler(handler.getHandler()));
+		int id =  modHandler.addHandler(handler.getHandler());
+		System.out.println("[GUI]" + handler + " -> " + id);
+		handler.register(mod.getModInstance(), id);
 	}
 
 	@Override

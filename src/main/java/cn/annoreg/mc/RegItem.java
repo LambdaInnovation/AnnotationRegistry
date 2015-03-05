@@ -17,6 +17,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Registers an item.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface RegItem {
@@ -35,16 +38,25 @@ public @interface RegItem {
 		String value();
 	}
 
+	/**
+	 * Reg this item into oreDictionary.
+	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
 	public @interface OreDict {
 		String value();
 	}
 	
+	/**
+	 * Populated on Item instance, indicating this item has an render.
+	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
 	public @interface HasRender {}
 
+	/**
+	 * Used with @HasRender on public static <? extends IItemRenderer> classes, will find that instance and register it.
+	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
 	public @interface Render {}
