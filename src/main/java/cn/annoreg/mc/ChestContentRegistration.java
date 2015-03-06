@@ -49,6 +49,18 @@ public class ChestContentRegistration extends RegistrationFieldSimple<RegChestCo
 			return "pyramidDesertyChest";
 		case 3:
 			return "pyramidJungleChest";
+		case 4:
+			return "mineshaftCorridor";
+		case 5:
+			return "pyramidJungleDispenser";
+		case 6:
+			return "strongholdCorridor";
+		case 7:
+			return "strongholdLibrary";
+		case 8:
+			return "strongholdCrossing";
+		case 9:
+			return "bonusChest";
 		}
 		return null;
 	}
