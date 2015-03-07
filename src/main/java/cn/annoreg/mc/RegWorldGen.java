@@ -21,6 +21,8 @@ import cpw.mods.fml.common.IWorldGenerator;
 import net.minecraft.util.WeightedRandomChestContent;
 
 /**
+ * Register your own WorldGen.<br />
+ * The parameter of it is the weight of mod generation, and it's an integer
  * @author KSkun
  */
 @Retention(RetentionPolicy.RUNTIME)

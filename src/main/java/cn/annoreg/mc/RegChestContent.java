@@ -18,6 +18,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Add your own ChestContent to ChestHooks.<br />
+ * The parameter of this is the type of dungeon you want to add. Put an int[] as the parameter.<br />
+ * List of number:<br />
+ * 0 - Dungeon Chest<br />
+ * 1 - Village Blacksmith<br />
+ * 2 - Deserty Pyramid Chest<br />
+ * 3 - Jungle Pyramid Chest<br />
+ * 4 - Mineshaft Corridor<br />
+ * 5 - Jungle Pyramid Dispenser<br />
+ * 6 - Stronghold Corridor<br />
+ * 7 - Stronghold Library<br />
+ * 8 - Stronghold Crossing<br />
+ * 9 - Bonus Chest
  * @author KSkun
  */
 @Retention(RetentionPolicy.RUNTIME)
