@@ -12,6 +12,7 @@
  */
 package cn.annoreg.core;
 
+import cn.annoreg.ARModContainer;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModContainer;
@@ -25,27 +26,56 @@ public class RegModInformation {
 	 */
 	private Object mod;
 	
-	public RegModInformation(Class<?> clazz) {
-		RegistrationMod mod = clazz.getAnnotation(RegistrationMod.class);
-		this.pkg = mod.pkg();
-		this.prefix = mod.prefix();
-		this.res = mod.res();
-		modid = clazz.getAnnotation(Mod.class).modid();
+	/**
+	 * Store class name before loading the mod class.
+	 */
+	private String modClassName;
+	
+	private void loadModClass() {
+	    if (pkg == null) {
+            Class<?> modClass;
+	        try {
+	            modClass = Class.forName(modClassName);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Can not get mod class.");
+            }
+
+	        if (!modClass.isAnnotationPresent(RegistrationMod.class)) {
+	            //This should not happen.
+	            ARModContainer.log.error("Unable to create RegistryMod {}", modClass.getCanonicalName());
+	        }
+	        
+	        //Get mod information.
+	        RegistrationMod rm = modClass.getAnnotation(RegistrationMod.class);
+	        this.pkg = rm.pkg();
+	        this.prefix = rm.prefix();
+	        this.res = rm.res();
+	        modid = modClass.getAnnotation(Mod.class).modid();
+	    }
+	}
+	
+	public RegModInformation(String className) {
+	    modClassName = className;
 	}
 
 	public String getPackage() {
+	    loadModClass();
 		return pkg;
 	}
 	
 	public String getPrefix() {
+        loadModClass();
 		return prefix;
 	}
 	
 	public String getRes(String id) {
+        loadModClass();
 		return res + ":" + id;
 	}
 	
 	public Object getModInstance() {
+        loadModClass();
 		if (mod != null) return mod;
 		ModContainer mc = Loader.instance().getIndexedModList().get(modid);
 		if (mc != null) {
@@ -57,6 +87,7 @@ public class RegModInformation {
 	}
 	
 	public String getModID() {
+        loadModClass();
 		return modid;
 	}
 }

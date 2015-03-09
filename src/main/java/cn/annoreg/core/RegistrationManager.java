@@ -35,7 +35,7 @@ public class RegistrationManager {
 	private Map<Class<? extends Annotation>, RegistryType> regByClass = new HashMap();
 	private Map<String, RegistryType> regByName = new HashMap();
 	
-	private Map<Class<?>, RegModInformation> modMap = new HashMap();
+	private Map<String, RegModInformation> modMap = new HashMap();
 	private Set<RegModInformation> mods = new HashSet();
 	
 	private Map<String, List<String>> innerClassList = new HashMap();
@@ -133,33 +133,18 @@ public class RegistrationManager {
 		}
 	}
 	
-	private RegModInformation createModFromObj(Class<?> modClazz) {
-		if (modMap.containsKey(modClazz)) {
-			return modMap.get(modClazz);
-		} else {
-			if (!modClazz.isAnnotationPresent(RegistrationMod.class)) {
-				ARModContainer.log.error("Unable to create RegistryMod {}", modClazz.getCanonicalName());
-				return null;
-			}
-			
-			RegModInformation rm = new RegModInformation(modClazz);
-			modMap.put(modClazz, rm);
-			return rm;
-		}
-	}
-	
-	private void addMod(RegModInformation mod) {
-		mods.add(mod);
+	private RegModInformation createModFromObj(String modClassName) {
+	    if (modMap.containsKey(modClassName)) {
+	        return modMap.get(modClassName);
+	    }
+	    RegModInformation ret = new RegModInformation(modClassName);
+	    modMap.put(modClassName, ret);
+	    return ret;
 	}
 
 	public void addAnnotationMod(Set<ASMData> data) {
 		for (ASMData asm : data) {
-			try {
-				addMod(createModFromObj(Class.forName(asm.getClassName())));
-			} catch (Exception e) {
-				ARModContainer.log.error("Error on loading registration package {}.", asm.getClassName());
-				e.printStackTrace();
-			}
+		    mods.add(createModFromObj(asm.getClassName()));
 		}
 	}
 	
@@ -176,7 +161,7 @@ public class RegistrationManager {
 	}
 	
 	public void registerAll(Object mod, String type) {
-		registerAll(createModFromObj(mod.getClass()), type);
+		registerAll(createModFromObj(mod.getClass().getName()), type);
 	}
 	
 	public void addRegistryTypes(Set<ASMData> data) {
