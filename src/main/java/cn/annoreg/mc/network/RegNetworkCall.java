@@ -12,6 +12,9 @@ import cpw.mods.fml.relauncher.Side;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface RegNetworkCall {
+    //WARNING: Don't modify this class! 
+    //This annotation is used with ASM library. 
+    //The class name and method name are hard-coded.
     
     //For static method, use the default NULL.
     //For non-static method, you must use another option.

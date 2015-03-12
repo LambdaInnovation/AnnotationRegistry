@@ -9,6 +9,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import cpw.mods.fml.relauncher.Side;
 import cn.annoreg.asm.network.NetworkCallTransformer;
 import cn.annoreg.mc.network.NetworkCallManager;
 
@@ -26,10 +27,12 @@ public class NetworkCallVisitor extends ClassVisitor {
     public class ClassMethod {
         public String name;
         public String desc;
+        public Side side;
         
-        public ClassMethod(String name, String desc) {
+        public ClassMethod(String name, String desc, Side side) {
             this.name = name;
             this.desc = desc;
+            this.side = side;
         }
     }
 
@@ -66,10 +69,20 @@ public class NetworkCallVisitor extends ClassVisitor {
         
         @Override
         public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+            final ClassMethod cm = new ClassMethod(this.name, this.desc, Side.CLIENT);
             if (desc.equals("Lcn/annoreg/mc/network/RegNetworkCall;")) {
-                methods.add(new ClassMethod(this.name, this.desc));
+                methods.add(cm);
             }
-            return null;
+            return new AnnotationVisitor(api, super.visitAnnotation(desc, visible)) {
+                @Override
+                public void visitEnum(String name, String desc, String value) {
+                    if (name.equals("side")) {
+                        if (value.equals("SERVER")) {
+                            cm.side = Side.SERVER;
+                        }
+                    }
+                }
+            };
         }
     }
      

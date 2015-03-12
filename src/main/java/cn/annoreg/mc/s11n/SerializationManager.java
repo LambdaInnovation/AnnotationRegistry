@@ -96,9 +96,12 @@ public class SerializationManager {
 		}
 	}
 	
-	//use null in obj if you are using INSTANCE or UPDATE option.
+	//use null in obj if the instance is unknown.
 	public Object deserialize(Object obj, NBTBase nbt, StorageOption.Option option) {
 		NBTTagCompound tag = (NBTTagCompound) nbt;
+		if (option == StorageOption.Option.AUTO) {
+		    option = StorageOption.Option.values()[tag.getInteger("option")];
+		}
 		if (tag.getInteger("option") != option.ordinal()) {
 			ARModContainer.log.error("Failed in deserialization. Class: {}.", tag.getString("class"));
 			Thread.dumpStack();

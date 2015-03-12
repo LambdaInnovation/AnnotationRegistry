@@ -28,11 +28,28 @@ public class StorageOption {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Update {}
+
+	/**
+	 * Used only in server-to-client network call.
+	 * Used on argument with the type of EntityPlayer.
+	 * If Target is given, the message is only sent to this player.
+	 * With this annotation, the StorageOption of INSTANCE is used.
+	 * @author acaly
+	 *
+	 */
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Target {}
 	
 	public enum Option {
 	    NULL,
 		DATA,
 		INSTANCE,
 		UPDATE,
+		
+		/**
+		 * Used only in deserialization.
+		 * Will use the option contained in the data.
+		 */
+		AUTO,
 	}
 }
