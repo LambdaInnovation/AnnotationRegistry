@@ -8,10 +8,12 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 import cpw.mods.fml.relauncher.Side;
-import cn.annoreg.asm.network.NetworkCallTransformer;
+import cn.annoreg.core.RegistrationClass;
 import cn.annoreg.mc.network.NetworkCallManager;
+import cn.annoreg.mc.network.RegNetworkCall;
 
 public class NetworkCallVisitor extends ClassVisitor {
     
@@ -51,12 +53,16 @@ public class NetworkCallVisitor extends ClassVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        if (desc.equals("Lcn/annoreg/core/RegistrationClass;")) {
+        if (desc.equals(Type.getDescriptor(RegistrationClass.class))) {
             isReg = true;
         }
         return null;
     }
     
+    /**
+     * This class picks all network-call methods and save them in {@link NetworkCallVisitor#methods}.
+     *
+     */
     private class NetworkCallMethodVisitor extends MethodVisitor {
         private String name;
         private String desc;
@@ -70,20 +76,23 @@ public class NetworkCallVisitor extends ClassVisitor {
         @Override
         public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
             final ClassMethod cm = new ClassMethod(this.name, this.desc, Side.CLIENT);
-            if (desc.equals("Lcn/annoreg/mc/network/RegNetworkCall;")) {
+            if (desc.equals(Type.getDescriptor(RegNetworkCall.class))) {
                 methods.add(cm);
             }
             return new AnnotationVisitor(api, super.visitAnnotation(desc, visible)) {
                 @Override
                 public void visitEnum(String name, String desc, String value) {
                     if (name.equals("side")) {
-                        if (value.equals("SERVER")) {
+                        if (value.equals(Side.SERVER.toString())) {
                             cm.side = Side.SERVER;
+                        } else {
+                            cm.side = Side.CLIENT;
                         }
                     }
                 }
             };
         }
+        
     }
-     
+    
 }

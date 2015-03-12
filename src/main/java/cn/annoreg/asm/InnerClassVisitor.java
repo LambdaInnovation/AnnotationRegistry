@@ -17,11 +17,15 @@ import java.util.List;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Type;
 
+import cn.annoreg.core.RegistrationClass;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class InnerClassVisitor extends ClassVisitor {
+    
     List<String> innerClasses = new ArrayList();
     boolean isReg = false;
     boolean clientOnly = false;
@@ -37,12 +41,19 @@ public class InnerClassVisitor extends ClassVisitor {
     
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        if (desc.equals("Lcn/annoreg/core/RegistrationClass;")) {
-            isReg = true;
+        if (desc.equals(Type.getDescriptor(SideOnly.class))) {
+            //We need to know if it's client only.
+            return new AnnotationVisitor(api) {
+                @Override
+                public void visitEnum(String name, String desc, String value) {
+                    if (value == Side.CLIENT.toString()) {
+                        InnerClassVisitor.this.clientOnly = true;
+                    }
+                }
+            };
         }
-        if (desc.equals("Lcpw/mods/fml/relauncher/SideOnly;")) {
-            clientOnly = true;
-            //Just check existence. SideOnly(SERVER) is not allowed. 
+        if (desc.equals(Type.getDescriptor(RegistrationClass.class))) {
+            isReg = true;
         }
         return null;
     }

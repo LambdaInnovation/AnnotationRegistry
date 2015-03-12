@@ -20,7 +20,20 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RegistrationMod {
+    /**
+     * Package prefix of the classes in this mod.
+     * @return
+     */
 	String pkg();
+	/**
+	 * Resource folder name of this mod.  
+	 * @return
+	 */
 	String res();
+	/**
+	 * An optional prefix of name in some registry types in case of name collision.
+	 * See {@link RegWithName}.
+	 * @return
+	 */
 	String prefix() default "";
 }

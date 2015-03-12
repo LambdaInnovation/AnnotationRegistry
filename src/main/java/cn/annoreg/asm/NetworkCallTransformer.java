@@ -1,4 +1,4 @@
-package cn.annoreg.asm.network;
+package cn.annoreg.asm;
 
 import java.util.List;
 

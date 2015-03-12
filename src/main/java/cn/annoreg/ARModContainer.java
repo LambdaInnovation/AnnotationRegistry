@@ -51,7 +51,7 @@ public class ARModContainer extends DummyModContainer {
 		super(new ModMetadata());
 		
 		ModMetadata md = getMetadata();
-		md.authorList = Lists.newArrayList("acaly");
+		md.authorList = Lists.newArrayList("Lambda Innovation");
 		md.modId = "AnnoReg";
 		md.name = "Annotation Registry";
 		md.version = "1.0beta";
@@ -67,6 +67,9 @@ public class ARModContainer extends DummyModContainer {
     @Subscribe
     public void constructMod(FMLConstructionEvent event) {
     	log.info("AnnotationRegistry is loading.");
+    	
+    	//Get annotation information from forge asm data table.
+    	//This must be done before PreInit stage.
     	ASMDataTable dt = event.getASMHarvestedData();
     	RegistrationManager.INSTANCE.addRegistryTypes(dt.getAll("cn.annoreg.core.RegistryTypeDecl"));
     	RegistrationManager.INSTANCE.annotationList(dt.getAll("cn.annoreg.core.RegistrationClass"));

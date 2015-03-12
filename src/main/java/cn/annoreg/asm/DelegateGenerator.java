@@ -1,4 +1,4 @@
-package cn.annoreg.asm.network;
+package cn.annoreg.asm;
 
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -14,7 +14,11 @@ import cn.annoreg.mc.network.NetworkCallManager;
 import cn.annoreg.mc.s11n.StorageOption;
 
 public class DelegateGenerator {
-
+    
+    /**
+     * Class loader used to generate delegate class.
+     *
+     */
     private static class DelegateClassLoader extends ClassLoader {
         public DelegateClassLoader() {
             super(NetworkCallDelegate.class.getClassLoader());
@@ -31,6 +35,13 @@ public class DelegateGenerator {
     public static MethodVisitor generateStaticMethod(MethodVisitor parent, 
             String className, String methodName, String desc, final Side side) {
         
+        //This method is a little bit complicated.
+        //We need to generate a delegate class implementing NetworkCallDelegate and a redirect
+        //the code that originally generated here in parent, into the delegate class,
+        //by returning a MethodVisitor under the ClassVisitor of the delegate class.
+        //Besides, we should generate a call to NetworkCallManager into parent.
+        
+        //delegateName is a string used by both sides to identify a network-call delegate.
         final String delegateName = className + ":" + methodName + ":" + desc;
         final Type[] args = Type.getArgumentTypes(desc);
         final Type ret = Type.getReturnType(desc);
@@ -38,8 +49,7 @@ public class DelegateGenerator {
         //Check types
         for (Type t : args) {
             if (!t.getDescriptor().startsWith("L") && !t.getDescriptor().startsWith("[")) {
-                throw new RuntimeException("Unsupported argument type in network call. " +
-                        "Imprimative types are not supported.");
+                throw new RuntimeException("Unsupported argument type in network call. ");
             }
         }
         if (!ret.equals(Type.VOID_TYPE)) {
@@ -61,7 +71,7 @@ public class DelegateGenerator {
             parent.visitInsn(Opcodes.AASTORE);
         }
         //Call cn.annoreg.mc.network.NetworkCallManager.onNetworkCall
-        parent.visitMethodInsn(Opcodes.INVOKESTATIC, "cn/annoreg/mc/network/NetworkCallManager", 
+        parent.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(NetworkCallManager.class), 
                 "onNetworkCall", "(Ljava/lang/String;[Ljava/lang/Object;)V");
         parent.visitInsn(Opcodes.RETURN);
         parent.visitMaxs(5, args.length);
@@ -101,6 +111,9 @@ public class DelegateGenerator {
         //@Override public void invoke(Object[] args) {
         //    delegated((Type0) args[0], (Type1) args[1], ...);
         //}
+        
+        //The returned MethodVisitor will visit the original version of the method,
+        //including its annotation, where we can get StorageOptions.
         return new MethodVisitor(Opcodes.ASM4, 
                 cw.visitMethod(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC, "delegated", desc, null, null)) {
             
@@ -138,11 +151,12 @@ public class DelegateGenerator {
             @Override
             public void visitEnd() {
                 super.visitEnd();
+                //This is the last method in the delegate class.
+                //Finish the class and do the registration.
                 cw.visitEnd();
                 try {
                     Class<?> clazz = classLoader.defineClass(delegateClassName, cw.toByteArray());
                     NetworkCallDelegate delegateObj = (NetworkCallDelegate) clazz.newInstance(); 
-                    //NetworkCallManager.registerDelegateClass(delegateName, delegateObj, side);
                     if (side == Side.CLIENT) {
                         NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex);
                     } else {

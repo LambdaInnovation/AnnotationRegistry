@@ -18,7 +18,6 @@ import cn.annoreg.mc.s11n.SerializationManager;
 import cn.annoreg.mc.s11n.StorageOption;
 
 public class NetworkCallManager {
-    //TODO make methods protected
     
     private interface Caller {
         void invoke(Object[] args);
@@ -84,6 +83,7 @@ public class NetworkCallManager {
         netHandler.registerMessage(MessageHandler.class, NetworkCallMessage.class, 2, Side.CLIENT);
     }
     
+    //WARNING: this method is called by the dynamically generated code. Don't change name.
     public static void onNetworkCall(String delegateName, Object[] args) {
         Caller caller = callerMap.get(delegateName);
         if (caller == null) {

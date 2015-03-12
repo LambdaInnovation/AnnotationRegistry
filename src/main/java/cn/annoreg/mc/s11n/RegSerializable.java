@@ -21,12 +21,16 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface RegSerializable {
 	
+    /**
+     * Custom instance serializer.
+     * @return
+     */
+	Class<? extends InstanceSerializer> instance() default InstanceSerializer.class;
 	/**
-	 * Custom object serializer. If you want auto serialization (with @SerializedField),
+	 * Custom data serializer. If you want auto serialization (with @SerializedField),
 	 * keep it as default.
 	 * @return
 	 */
-	Class<? extends InstanceSerializer> instance() default InstanceSerializer.class;
 	Class<? extends DataSerializer> data() default DataSerializer.class;
 
 	/**
