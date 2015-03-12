@@ -22,6 +22,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
+import cpw.mods.fml.relauncher.Side;
 import cn.annoreg.core.RegistrationClass;
 import cn.annoreg.core.RegistrationManager;
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -38,16 +39,28 @@ public class RegistryTransformer implements IClassTransformer {
 		if (arg0.startsWith("cn.annoreg.")) {
 			return data;
 		}
-		ArrayList<String> innerClasses = new ArrayList();
 		ClassReader cr = new ClassReader(data);
-		ClassWriter cw = new ClassWriter(Opcodes.ASM4);
-		InnerClassVisitor cv = new InnerClassVisitor(Opcodes.ASM4, cw);
-		cr.accept(cv, 0);
-		List<String> inner = cv.getInnerClassList();
-		if (inner != null) {
-		    RegistrationManager.INSTANCE.addInnerClassList(arg0, inner);
+		
+		//Get inner class list for each class
+		{
+	        InnerClassVisitor cv = new InnerClassVisitor(Opcodes.ASM4);
+	        cr.accept(cv, 0);
+	        List<String> inner = cv.getInnerClassList();
+	        if (inner != null) {
+	            RegistrationManager.INSTANCE.addInnerClassList(arg0, inner);
+	        }
 		}
-		return cw.toByteArray();
+		//Transform network-calls for each class
+		{
+		    NetworkCallVisitor cv = new NetworkCallVisitor(Opcodes.ASM4, arg0);
+		    cr.accept(cv, 0);
+	        if (cv.needTransform()) {
+	            ClassWriter cw = new ClassWriter(Opcodes.ASM4);
+	            cr.accept(cv.getTransformer(cw), 0);
+	            data = cw.toByteArray();
+	        }
+		}
+		return data;
 	}
 
 }

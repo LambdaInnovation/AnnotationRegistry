@@ -58,6 +58,8 @@ public class SerializationManager {
 		ret.setString("class", clazz.getName());
 		ret.setInteger("option", option.ordinal());
 		switch (option) {
+		case NULL:
+		    return ret;
 		case DATA:
 			try {
 				ret.setTag("data", d.writeData(obj));
@@ -112,6 +114,8 @@ public class SerializationManager {
 		NBTBase data = tag.getTag("data");
 		NBTBase ins = tag.getTag("instance");
 		switch (option) {
+		case NULL:
+		    return null;
 		case DATA:
 		{
 			DataSerializer ser = getDataSerializer(clazz);
