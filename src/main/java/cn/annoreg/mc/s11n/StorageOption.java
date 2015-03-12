@@ -17,6 +17,9 @@ import java.lang.annotation.RetentionPolicy;
 
 public class StorageOption {
 
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Null {}
+
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Data {}
 
@@ -27,6 +30,7 @@ public class StorageOption {
 	public @interface Update {}
 	
 	public enum Option {
+	    NULL,
 		DATA,
 		INSTANCE,
 		UPDATE,
