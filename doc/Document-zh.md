@@ -81,4 +81,4 @@ RegistrationManager.INSTANCE.registerAll(this, "Block");
 
 各注册类型及用法
 ---
-参见[RegTypes-zh.md](doc/RegTypes-zh.md)。
+参见[RegTypes-zh.md](RegTypes-zh.md)。
