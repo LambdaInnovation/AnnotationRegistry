@@ -32,6 +32,7 @@ public class RegistrationManager {
 	private Set<String> unloadedClass = new HashSet();
 	private Set<Class<?>> loadedClass = new HashSet();
 	
+	private Set<ASMData> unloadedRegType;
 	private Map<Class<? extends Annotation>, RegistryType> regByClass = new HashMap();
 	private Map<String, RegistryType> regByName = new HashMap();
 	
@@ -47,6 +48,7 @@ public class RegistrationManager {
 	}
 	
 	private void loadClasses() {
+	    loadRegistryTypes();
 		for (String name : unloadedClass) {
 			try {
 				prepareClass(Class.forName(name));
@@ -163,18 +165,23 @@ public class RegistrationManager {
 	public void registerAll(Object mod, String type) {
 		registerAll(createModFromObj(mod.getClass().getName()), type);
 	}
-	
-	public void addRegistryTypes(Set<ASMData> data) {
-		for (ASMData asm : data) {
-			try {
-				Class<?> clazz = Class.forName(asm.getClassName());
-				RegistryType rt = (RegistryType) clazz.newInstance();
-				addRegType(rt);
-			} catch (Exception e) {
-				ARModContainer.log.warn("Error on adding registry type {}.", asm.getClassName()); //TODO side only type will go here
-			}
-		}
-	}
+
+    public void addRegistryTypes(Set<ASMData> data) {
+        unloadedRegType = data;
+    }
+
+    private void loadRegistryTypes() {
+        for (ASMData asm : unloadedRegType) {
+            try {
+                Class<?> clazz = Class.forName(asm.getClassName());
+                RegistryType rt = (RegistryType) clazz.newInstance();
+                addRegType(rt);
+            } catch (Exception e) {
+                ARModContainer.log.warn("Error on adding registry type {}.", asm.getClassName()); //TODO side only type will go here
+            }
+        }
+        unloadedRegType.clear();
+    }
 	
 	public void addSideOnlyRegAnnotation(Set<ASMData> data) {
 		for (ASMData asm : data) {
