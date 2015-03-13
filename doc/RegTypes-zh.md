@@ -36,7 +36,7 @@ RegistrationManager.INSTANCE.registerAll(this, "StartServer");
 Entity
 ---
 在Entity的继承类上使用```@RegEntity```。可以使用```@RegEntity.HasRender```和```@RegEntity.Render```联合指定Renderer，例如：
-```
+```java
 @RegistrationClass
 @RegEntity
 @RegEntity.HasRender
