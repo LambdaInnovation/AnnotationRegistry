@@ -40,7 +40,7 @@ Entity
 @RegistrationClass
 @RegEntity
 @RegEntity.HasRender
-public class MyEntity {
+public class MyEntity extends Entity {
     @RegEntity.Render
     @SideOnly(Side.CLIENT)
     public static MyRender renderer;
