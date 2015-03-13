@@ -62,7 +62,12 @@ MessageHandler
 @RegMessageHandler(msg = MyMessage.class, side = RegMessageHandler.Side.CLIENT)
 class MyMessageHandler implements IMessageHandler<MyMessage, IMessage> {
 ```
-通过side指定Handler是在服务器端或是在客户端。
+通过side指定Handler是在服务器端或是在客户端。要使用这个功能，除了上述声明外，还必须在主类中提供Handler实例，并添加```@RegMessageHandler.WrapperInstance```。例如：
+```java
+@RegMessageHandler.WrapperInstance
+public static SimpleNetworkWrapper netHandler = NetworkRegistry.INSTANCE.newSimpleChannel("examplemod_channle");
+```
+发送Message时直接发送到这个netHandler即可。另外SimpleNetworkWrapper注册Handler时需要指定一个唯一的数字，这里通过Annotation Registry注册的Handler会从100开始，因此在Mod的其他地方使用通常方法注册Handler如果从0开始的话并不会受到影响。
 
 PreloadTexture
 ---
