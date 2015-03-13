@@ -2,7 +2,7 @@
 {
   "modid": "AnnoReg",
   "name": "Annotation Registry",
-  "description": "A coremod API to allow annotation drived registration and other useful utilities in Minecraft.",
+  "description": "A coremod API to open up annotation drived registration mechanism and other useful utilities in Minecraft.",
   "version": "1.0beta",
   "mcversion": "1.7.2",
   "url": "",
