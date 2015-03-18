@@ -149,7 +149,7 @@ task deobfJar(type: Jar, dependsOn: 'setupMavenRepo') {
 // add api classes to main package
 jar {
     manifest {
-        attributes 'FMLCorePlugin': 'cn.annoreg.AnnoCoreRegistry'
+        attributes 'FMLCorePlugin': 'cn.annoreg.AnnoRegCorePlugin'
     }
     dependsOn 'setupMavenRepo'
 }
