@@ -54,7 +54,7 @@ public class ARModContainer extends DummyModContainer {
 		md.authorList = Lists.newArrayList("Lambda Innovation");
 		md.modId = "AnnoReg";
 		md.name = "Annotation Registry";
-		md.version = "1.0beta";
+		md.version = "1.0beta2";
 	}
 	
     @Override
