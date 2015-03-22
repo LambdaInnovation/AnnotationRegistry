@@ -83,3 +83,9 @@ forgemaven {
         }
     }
 }
+
+jar {
+    manifest {
+        attributes 'FMLCorePlugin': 'cn.annoreg.AnnoRegCorePlugin'
+    }
+}
