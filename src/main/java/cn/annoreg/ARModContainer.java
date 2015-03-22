@@ -45,6 +45,7 @@ import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.VersionRange;
 
 public class ARModContainer extends DummyModContainer {
+	
 	public static Logger log = LogManager.getLogger("AnnotationRegistry");
 
 	public ARModContainer() {
@@ -54,7 +55,7 @@ public class ARModContainer extends DummyModContainer {
 		md.authorList = Lists.newArrayList("Lambda Innovation");
 		md.modId = "AnnoReg";
 		md.name = "Annotation Registry";
-		md.version = "1.0beta2";
+		md.version = "1.0beta2_pre1";
 	}
 	
     @Override
