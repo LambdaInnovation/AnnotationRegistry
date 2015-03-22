@@ -84,7 +84,7 @@ forgemaven {
     }
 }
 
-jar {
+excludeDepJar {
     manifest {
         attributes 'FMLCorePlugin': 'cn.annoreg.AnnoRegCorePlugin'
     }
