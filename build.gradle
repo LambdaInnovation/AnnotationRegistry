@@ -45,6 +45,10 @@ forgemaven {
     jarClasses {
     }
 
+    coremod {
+        plugin = 'cn.annoreg.AnnoRegCorePlugin'
+    }
+
     gitUser {
         username = 'LI Github'
         email = 'github@li-dev.cn'
@@ -81,11 +85,5 @@ forgemaven {
                 }
             }
         }
-    }
-}
-
-excludeDepJar {
-    manifest {
-        attributes 'FMLCorePlugin': 'cn.annoreg.AnnoRegCorePlugin'
     }
 }
