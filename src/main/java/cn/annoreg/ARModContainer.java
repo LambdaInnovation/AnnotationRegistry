@@ -49,6 +49,7 @@ import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
 import cpw.mods.fml.common.versioning.VersionRange;
 
 public class ARModContainer extends DummyModContainer {
+	
 	public static Logger log = LogManager.getLogger("AnnotationRegistry");
 	public static final String MODID = "AnnoReg";
 
