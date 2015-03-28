@@ -61,7 +61,7 @@ public class AnnoRegCorePlugin implements IFMLLoadingPlugin {
                 ZipEntry modInfo = jar.getEntry("mcmod.info");
                 mc = MetadataCollection.from(jar.getInputStream(modInfo), modFile.getName());
                 jar.close();
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             } finally {
                 if (jar != null) {
