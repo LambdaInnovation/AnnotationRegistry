@@ -1,7 +1,7 @@
 //This build script can upload built jars to a maven repo.
 //
 //Usage:
-//  Use task 'uploadGithubAndClean'. It will build, generate jars and publish them.
+//  Use task 'uploadModToOss'. It will build, generate jars and publish them.
 //  gradle params:
 //    -PnewMavenRepo=1
 //      Create a new maven repo.
