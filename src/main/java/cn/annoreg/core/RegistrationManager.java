@@ -32,7 +32,7 @@ public class RegistrationManager {
 	private Set<String> unloadedClass = new HashSet();
 	private Set<Class<?>> loadedClass = new HashSet();
 	
-	private Set<ASMData> unloadedRegType;
+	private Set<ASMData> unloadedRegType = new HashSet();
 	private Map<Class<? extends Annotation>, RegistryType> regByClass = new HashMap();
 	private Map<String, RegistryType> regByName = new HashMap();
 	
