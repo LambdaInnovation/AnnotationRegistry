@@ -122,9 +122,14 @@ public class GuiHandlers {
 ```
 要开启这个Gui，只需要在任意地方（必须在客户端）调用```GuiHandlers.handlerPresetSettings.openClientGui()```即可。
 
+Serializable
+---
+指定一个class的序列化器。序列化分为实例序列化(Instance)和数据序列化(Data)两种基本模式和更新序列化(Updata)的混合模式。在指定序列化器时，可以分别指定实例和数据的序列化器，更新序列化会自动通过两种基本序列化器进行。
+
+基本来讲，实例序列化用于将一个对象的实例引用进行序列化（例如服务器端和客户端上的Entity对象）。数据序列化用于将一个对象的内容进行序列化（例如一个ItemStack）。更新序列化器则首先通过实例序列化其找到实例，然后通过数据序列化器将数据写入这个实例。
+
 NetworkCall
 ---
-！注意：这个类型还不完善。
 NetworkCall可以允许客户端触发服务器端的一个函数，或者反之。函数的参数通过Serialization模块实现。一个简单的例子如下：
 ```java
 @RegNetworkCall(side = Side.SERVER)
@@ -134,4 +139,22 @@ public static void myNetworkCall(@StorageOption.Data Integer i) {
 ```
 在客户端直接调用这个myNetworkCall函数，就会在服务器端输出给定的参数。一个典型的用法是在服务器端响应客户端Gui上的事件。
 
-目前只支持从客户端到服务器端的static函数和少数几种参数类型。
+目前支持客户端和服务器端之间的双向调用，函数可以为static或非static函数（需要指定this的序列化方式）。
+
+在需要得到返回值时，可以使用Future对象进行包装。例如以下代码从ret返回参数a的值加1的结果。
+```java
+@RegNetworkCall(side = Side.SERVER)
+public static void getValue(@Data Integer a, @Data Future ret) {
+    ret.setAndSync(a + 1);
+}
+```
+使用时需要
+```java
+getValue(0, Future.create(new FutureCallback() {
+    @Override public void onReady(Object result) {
+        //result will contain the value returned
+    }
+}));
+```
+Future对象可以使用Data或Instance序列化方式，这个方式将决定Future所传递的内容的序列化方式。
+注意一个Future只能同步一次。因此当从Server发往Client时只有一个Client可以向Future中写入值。
