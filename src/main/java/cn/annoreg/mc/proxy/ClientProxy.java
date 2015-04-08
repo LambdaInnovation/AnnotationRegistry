@@ -64,8 +64,14 @@ public class ClientProxy extends ServerProxy {
 			return null;
 		}
 	}
-	
+
+    @Override
 	public EntityPlayer getThePlayer() {
 		return Minecraft.getMinecraft().thePlayer;
 	}
+
+    @Override
+    public EntityPlayer getPlayerOnServer(String name) {
+        return null;
+    }
 }

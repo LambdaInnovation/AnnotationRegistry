@@ -40,6 +40,12 @@ public class DelegateGenerator {
         }
     }
     
+    private static void pushIntegerConst(MethodVisitor mv, int val) {
+        mv.visitLdcInsn(val);
+        //mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(Integer.class), 
+        //        "intValue", Type.getMethodDescriptor(Type.INT_TYPE));
+    }
+    
     private static final DelegateClassLoader classLoader = new DelegateClassLoader();
     
     private static int delegateNextID = 0;
@@ -60,6 +66,7 @@ public class DelegateGenerator {
         
         //Check types
         for (Type t : args) {
+            //TODO support these types
             if (!t.getDescriptor().startsWith("L") && !t.getDescriptor().startsWith("[")) {
                 throw new RuntimeException("Unsupported argument type in network call. ");
             }
@@ -74,48 +81,53 @@ public class DelegateGenerator {
         //First parameter
         parent.visitLdcInsn(delegateName);
         //Second parameter: object array
-        parent.visitLdcInsn(args.length); //array size
-        parent.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+        pushIntegerConst(parent, args.length); //array size
+        parent.visitTypeInsn(Opcodes.ANEWARRAY, Type.getInternalName(Object.class));
         for (int i = 0; i < args.length; ++i) {
             parent.visitInsn(Opcodes.DUP);
-            parent.visitLdcInsn(i);
+            pushIntegerConst(parent, i);
             parent.visitVarInsn(Opcodes.ALOAD, i);
             parent.visitInsn(Opcodes.AASTORE);
         }
         //Call cn.annoreg.mc.network.NetworkCallManager.onNetworkCall
         parent.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(NetworkCallManager.class), 
-                "onNetworkCall", "(Ljava/lang/String;[Ljava/lang/Object;)V");
+                "onNetworkCall", 
+                Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(String.class), Type.getType(Object[].class)));
         parent.visitInsn(Opcodes.RETURN);
         parent.visitMaxs(5, args.length);
         parent.visitEnd();
         
         //Create delegate object.
-        final ClassWriter cw = new ClassWriter(Opcodes.ASM4);
-        final String delegateClassName = "cn.annoreg.asm.NetworkCallDelegate_" + Integer.toString(delegateNextID++);
-        cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, delegateClassName.replace('.', '/'), null, 
-                "java/lang/Object", new String[]{"cn/annoreg/mc/network/NetworkCallDelegate"});
+        final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+        final Type delegateClassType = Type.getType("cn/annoreg/asm/NetworkCallDelegate_" + Integer.toString(delegateNextID++));
+        cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, delegateClassType.getInternalName(), null, 
+                Type.getInternalName(Object.class), new String[]{ Type.getInternalName(NetworkCallDelegate.class) });
         //package cn.annoreg.asm;
         //class NetworkCallDelegate_? implements NetworkCallDelegate {
         {
-            MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
+            MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, 
+                    "<init>", "()V", null, null);
             mv.visitCode();
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(Object.class), "<init>", "()V");
             mv.visitInsn(Opcodes.RETURN);
             mv.visitMaxs(1, 1);
             mv.visitEnd();
         }
         //public NetworkCallDelegate_?() {}
         {
-            MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "invoke", "([Ljava/lang/Object;)V", null, null);
+            MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, 
+                    "invoke", 
+                    Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(Object[].class)),
+                    null, null);
             mv.visitCode();
             for (int i = 0; i < args.length; ++i) {
                 mv.visitVarInsn(Opcodes.ALOAD, 1); //0 is this
-                mv.visitLdcInsn(i);
+                pushIntegerConst(mv, i);
                 mv.visitInsn(Opcodes.AALOAD);
                 mv.visitTypeInsn(Opcodes.CHECKCAST, args[i].getInternalName());
             }
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, delegateClassName.replace('.', '/'), "delegated", desc);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, delegateClassType.getInternalName(), "delegated", desc);
             mv.visitInsn(Opcodes.RETURN);
             mv.visitMaxs(args.length + 2, 2);
             mv.visitEnd();
@@ -167,7 +179,7 @@ public class DelegateGenerator {
                 //Finish the class and do the registration.
                 cw.visitEnd();
                 try {
-                    Class<?> clazz = classLoader.defineClass(delegateClassName, cw.toByteArray());
+                    Class<?> clazz = classLoader.defineClass(delegateClassType.getClassName(), cw.toByteArray());
                     NetworkCallDelegate delegateObj = (NetworkCallDelegate) clazz.newInstance(); 
                     if (side == Side.CLIENT) {
                         NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex);
@@ -185,4 +197,160 @@ public class DelegateGenerator {
         //}
     }
     
+
+    public static MethodVisitor generateNonStaticMethod(MethodVisitor parent, 
+            String className, String methodName, String desc, final Side side) {
+        
+        //convert desc to a non-static method form
+        String nonstaticDesc;
+        {
+            Type staticType = Type.getMethodType(desc);
+            Type retType = staticType.getReturnType();
+            Type[] argsType = staticType.getArgumentTypes();
+            Type[] argsTypeWithThis = new Type[argsType.length + 1];
+            argsTypeWithThis[0] = Type.getType('L' + className.replace('.', '/') + ';');
+            System.arraycopy(argsType, 0, argsTypeWithThis, 1, argsType.length);
+            nonstaticDesc = Type.getMethodDescriptor(retType, argsTypeWithThis);
+        }
+
+        //delegateName is a string used by both sides to identify a network-call delegate.
+        final String delegateName = className + ":" + methodName + ":" + desc;
+        final Type[] args = Type.getArgumentTypes(nonstaticDesc);
+        final Type ret = Type.getReturnType(nonstaticDesc);
+        
+        //Check types
+        for (Type t : args) {
+            //TODO support these types
+            if (!t.getDescriptor().startsWith("L") && !t.getDescriptor().startsWith("[")) {
+                throw new RuntimeException("Unsupported argument type in network call. ");
+            }
+        }
+        if (!ret.equals(Type.VOID_TYPE)) {
+            throw new RuntimeException("Unsupported return value type in network call. " + 
+                    "Only void is supported.");
+        }
+        
+        //Generate call to NetworkCallManager in parent.
+        parent.visitCode();
+        //First parameter
+        parent.visitLdcInsn(delegateName);
+        //Second parameter: object array
+        pushIntegerConst(parent, args.length); //this (0) has been included
+        parent.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+        for (int i = 0; i < args.length; ++i) {
+            parent.visitInsn(Opcodes.DUP);
+            pushIntegerConst(parent, i);
+            parent.visitVarInsn(Opcodes.ALOAD, i);
+            parent.visitInsn(Opcodes.AASTORE);
+        }
+        //Call cn.annoreg.mc.network.NetworkCallManager.onNetworkCall
+        parent.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(NetworkCallManager.class), 
+                "onNetworkCall", "(Ljava/lang/String;[Ljava/lang/Object;)V");
+        parent.visitInsn(Opcodes.RETURN);
+        parent.visitMaxs(5, args.length);
+        parent.visitEnd();
+
+        //Create delegate object.
+        final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+        final Type delegateClassType = Type.getType("cn/annoreg/asm/NetworkCallDelegate_" + Integer.toString(delegateNextID++));
+        cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, delegateClassType.getInternalName(), null, 
+                Type.getInternalName(Object.class), new String[]{ Type.getInternalName(NetworkCallDelegate.class) });
+        //package cn.annoreg.asm;
+        //class NetworkCallDelegate_? implements NetworkCallDelegate {
+        {
+            MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, 
+                    "<init>", "()V", null, null);
+            mv.visitCode();
+            mv.visitVarInsn(Opcodes.ALOAD, 0);
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Type.getInternalName(Object.class), "<init>", "()V");
+            mv.visitInsn(Opcodes.RETURN);
+            mv.visitMaxs(1, 1);
+            mv.visitEnd();
+        }
+        //public NetworkCallDelegate_?() {}
+        {
+            MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, 
+                    "invoke", 
+                    Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(Object[].class)),
+                    null, null);
+            mv.visitCode();
+            for (int i = 0; i < args.length; ++i) {
+                mv.visitVarInsn(Opcodes.ALOAD, 1); //0 is this
+                pushIntegerConst(mv, i);
+                mv.visitInsn(Opcodes.AALOAD);
+                mv.visitTypeInsn(Opcodes.CHECKCAST, args[i].getInternalName());
+            }
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, delegateClassType.getInternalName(), "delegated", nonstaticDesc);
+            mv.visitInsn(Opcodes.RETURN);
+            mv.visitMaxs(args.length + 2, 2);
+            mv.visitEnd();
+        }
+        //@Override public void invoke(Object[] args) {
+        //    delegated((Type0) args[0], (Type1) args[1], ...);
+        //}
+        
+        //The returned MethodVisitor will visit the original version of the method,
+        //including its annotation, where we can get StorageOptions.
+        return new MethodVisitor(Opcodes.ASM4, 
+                cw.visitMethod(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC, "delegated", nonstaticDesc, null, null)) {
+            
+            //Remember storage options for each argument
+            StorageOption.Option[] options = new StorageOption.Option[args.length];
+            int targetIndex = -1;
+            
+            {
+                for (int i = 0; i < options.length; ++i) {
+                    options[i] = StorageOption.Option.NULL; //set default value
+                }
+                options[0] = StorageOption.Option.INSTANCE;
+            }
+            
+            @Override
+            public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
+                parameter = parameter + 1; //skip this
+                Type type = Type.getType(desc);
+                if (type.equals(Type.getType(StorageOption.Data.class))) {
+                    options[parameter] = StorageOption.Option.DATA;
+                } else if (type.equals(Type.getType(StorageOption.Instance.class))) {
+                    options[parameter] = StorageOption.Option.INSTANCE;
+                } else if (type.equals(Type.getType(StorageOption.Update.class))) {
+                    options[parameter] = StorageOption.Option.UPDATE;
+                } else if (type.equals(Type.getType(StorageOption.Null.class))) {
+                    options[parameter] = StorageOption.Option.NULL;
+                } else if (type.equals(Type.getType(StorageOption.Target.class))) {
+                    if (!args[parameter].equals(Type.getType(EntityPlayer.class))) {
+                        throw new RuntimeException("Target annotation can only be used on EntityPlayer.");
+                    }
+                    options[parameter] = StorageOption.Option.INSTANCE;
+                    targetIndex = parameter;
+                }
+                return super.visitParameterAnnotation(parameter, desc, visible);
+            }
+            
+            //TODO this option (from annotation)
+            
+            @Override
+            public void visitEnd() {
+                super.visitEnd();
+                //This is the last method in the delegate class.
+                //Finish the class and do the registration.
+                cw.visitEnd();
+                try {
+                    Class<?> clazz = classLoader.defineClass(delegateClassType.getClassName(), cw.toByteArray());
+                    NetworkCallDelegate delegateObj = (NetworkCallDelegate) clazz.newInstance(); 
+                    if (side == Side.CLIENT) {
+                        NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex);
+                    } else {
+                        NetworkCallManager.registerServerDelegateClass(delegateName, delegateObj, options);
+                    }
+                } catch (Throwable e) {
+                    throw new RuntimeException("Can not create delegate for network call.", e);
+                }
+            }
+        };
+        //public static void delegated(Type0 arg0, Type1, arg1, ...) {
+        //    //Code generated by caller.
+        //}
+        //}
+    }
 }

@@ -54,6 +54,7 @@ public class RegistrationManager {
 				prepareClass(Class.forName(name));
 			} catch (Exception e) {
 				ARModContainer.log.warn("Can not load class {}, maybe a SideOnly class.", name);
+				//TODO check whether it's really caused by sideonly
 			} catch (Throwable e) {
 				ARModContainer.log.fatal("Error on loading class {}. Please check the implementation.", name);
 				e.printStackTrace();

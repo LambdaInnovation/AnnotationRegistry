@@ -17,6 +17,8 @@ import io.netty.buffer.ByteBuf;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -77,7 +79,7 @@ public class NetworkCallManager {
             Object[] params = new Object[nbtList.tagCount()];
             for (int i = 0; i < params.length; ++i) {
                 //TODO removeTag is the only way to get a tag at the given index?
-                params[i] = SerializationManager.INSTANCE.deserialize(null, nbtList.removeTag(i), StorageOption.Option.AUTO);
+                params[i] = SerializationManager.INSTANCE.deserialize(null, nbtList.removeTag(0), StorageOption.Option.AUTO);
             }
             delegate.invoke(params);
             return null;
@@ -105,9 +107,29 @@ public class NetworkCallManager {
         caller.invoke(args);
     }
     
-    public static void registerClientDelegateClass(String delegateName, NetworkCallDelegate delegate,
-            StorageOption.Option[] options, int targetIndex) {
-        //TODO
+    public static void registerClientDelegateClass(final String delegateName, NetworkCallDelegate delegate,
+            final StorageOption.Option[] options, final int targetIndex) {
+        callerMap.put(delegateName, new Caller() {
+            @Override
+            public void invoke(Object[] args) {
+                if (args.length != options.length) {
+                    //This should not happen.
+                    ARModContainer.log.fatal("Network call: incorrect parameter number.");
+                    throw new RuntimeException();
+                }
+                NBTTagList params = new NBTTagList();
+                for (int i = 0; i < args.length; ++i) {
+                    params.appendTag(SerializationManager.INSTANCE.serialize(args[i], options[i]));
+                }
+                if (targetIndex == -1) {
+                    netHandler.sendToAll(new NetworkCallMessage(delegateName, params));
+                } else {
+                    EntityPlayerMP playerTarget = (EntityPlayerMP) args[targetIndex];
+                    netHandler.sendTo(new NetworkCallMessage(delegateName, params), playerTarget);
+                }
+            }
+        });
+        delegateMap.put(delegateName, delegate);
     }
     public static void registerServerDelegateClass(final String delegateName, NetworkCallDelegate delegate, 
             final StorageOption.Option[] options) {

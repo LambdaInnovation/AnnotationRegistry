@@ -16,6 +16,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -48,5 +49,9 @@ public class ServerProxy {
 	
 	public EntityPlayer getThePlayer() {
 		return null;
+	}
+	
+	public EntityPlayer getPlayerOnServer(String name) {
+	    return MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(name);
 	}
 }

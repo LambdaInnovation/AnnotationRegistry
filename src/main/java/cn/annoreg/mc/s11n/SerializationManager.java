@@ -21,6 +21,9 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import cn.annoreg.ARModContainer;
 import cn.annoreg.mc.ProxyHelper;
+import cn.annoreg.mc.SideHelper;
+import cn.annoreg.mc.network.Future;
+import cn.annoreg.mc.network.NetworkTerminal;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -49,6 +52,7 @@ public class SerializationManager {
 	
 	private Map<Class, DataSerializer> dataSerializers = new HashMap();
 	private Map<Class, InstanceSerializer> instanceSerializers = new HashMap();
+	private Map<String, InstanceSerializer> instanceSerializersFromId = new HashMap();
 
 	public NBTBase serialize(Object obj, StorageOption.Option option) {
 		Class clazz = obj.getClass();
@@ -72,6 +76,8 @@ public class SerializationManager {
 		case INSTANCE:
 			try {
 				ret.setTag("instance", i.writeInstance(obj));
+				//we need to remember the class of i (also the id of i), not of obj.
+				ret.setString("class", i.getClass().getName());
 				return ret;
 			} catch (Exception e) {
 				ARModContainer.log.error("Failed in instance serialization. Class: {}.", clazz.getCanonicalName());
@@ -106,14 +112,7 @@ public class SerializationManager {
 			ARModContainer.log.error("Failed in deserialization. Class: {}.", tag.getString("class"));
 			Thread.dumpStack();
 		}
-		Class<?> clazz;
-		try {
-			clazz = Class.forName(tag.getString("class"));
-		} catch (ClassNotFoundException e) {
-			ARModContainer.log.error("Failed in deserialization. Class: {}.", tag.getString("class"));
-			e.printStackTrace();
-			return null;
-		}
+		Class<?> clazz = null;
 		NBTBase data = tag.getTag("data");
 		NBTBase ins = tag.getTag("instance");
 		switch (option) {
@@ -121,56 +120,75 @@ public class SerializationManager {
 		    return null;
 		case DATA:
 		{
+	        try {
+	            clazz = Class.forName(tag.getString("class"));
+	        } catch (ClassNotFoundException e) {
+	            ARModContainer.log.error("Failed in deserialization. Class: {}.", tag.getString("class"));
+	            e.printStackTrace();
+	            return null;
+	        }
 			DataSerializer ser = getDataSerializer(clazz);
 			try {
 				return ser.readData(data, obj);
 			} catch (Exception e) {
 				ARModContainer.log.error("Failed in data deserialization. Class: {}.",
-						clazz.getCanonicalName());
+				        tag.getString("class"));
 				e.printStackTrace();
 				return null;
 			}
 		}
 		case INSTANCE:
 		{
-			InstanceSerializer ser = getInstanceSerializer(clazz);
+			//InstanceSerializer ser = getInstanceSerializer(clazz);
+		    InstanceSerializer ser = instanceSerializersFromId.get(tag.getString("class"));
 			try {
+	            if (ser == null)
+	                throw new RuntimeException("Can not find instance serializer with id " + tag.getString("class"));
 				return ser.readInstance(ins);
 			} catch (Exception e) {
 				ARModContainer.log.error("Failed in instance deserialization. Class: {}.",
-						clazz.getCanonicalName());
+				        tag.getString("class"));
 				e.printStackTrace();
 				return null;
 			}
 		}
 		case UPDATE:
 		{
-			DataSerializer d = getDataSerializer(clazz);
-			InstanceSerializer i = getInstanceSerializer(clazz);
+            InstanceSerializer i = instanceSerializersFromId.get(tag.getString("class"));
 			try {
 				Object objIns = i.readInstance(ins);
 				if (objIns == null) {
 					throw new Exception("Instance is null.");
 				}
+	            DataSerializer d = getDataSerializer(objIns.getClass());
 				d.readData(data, objIns);
 				return objIns;
 			} catch (Exception e) {
 				ARModContainer.log.error("Failed in update deserialization. Class: {}.",
-						clazz.getCanonicalName());
+				        tag.getString("class"));
 				e.printStackTrace();
 				return null;
 			}
 		}
 		default:
 			ARModContainer.log.error("Failed in deserialization. Class: {}. Unknown option.",
-					clazz.getCanonicalName());
+			        tag.getString("class"));
 			Thread.dumpStack();
 			return null;
 		}
 	}
 	
 	public <T> InstanceSerializer<T> getInstanceSerializer(Class<T> clazz) {
-		return instanceSerializers.get(clazz);
+	    //We need to search for super classes
+	    Class c = clazz;
+	    while (c != null) {
+	        InstanceSerializer<T> ret =instanceSerializers.get(c);
+	        if (ret != null) {
+	            return ret;
+	        }
+	        c = c.getSuperclass();
+	    }
+	    return null;
 	}
 	
 	public <T> DataSerializer<T> getDataSerializer(Class<T> clazz) {
@@ -203,6 +221,7 @@ public class SerializationManager {
 	
 	void setInstanceSerializerFor(Class<?> clazz, InstanceSerializer serializer) {
 		instanceSerializers.put(clazz, serializer);
+		instanceSerializersFromId.put(serializer.getClass().getName(), serializer);
 	}
 	
 	private void initInternalSerializers() {
@@ -373,7 +392,7 @@ public class SerializationManager {
 				@Override
 				public Entity readInstance(NBTBase nbt) throws Exception {
 					int[] ids = ((NBTTagIntArray) nbt).func_150302_c();
-					World world = ProxyHelper.getWorld(ids[0]);
+					World world = SideHelper.getWorld(ids[0]);
 					if (world != null) {
 						return world.getEntityByID(ids[1]);
 					}
@@ -392,7 +411,7 @@ public class SerializationManager {
 				@Override
 				public TileEntity readInstance(NBTBase nbt) throws Exception {
 					int[] ids = ((NBTTagIntArray) nbt).func_150302_c();
-					World world = ProxyHelper.getWorld(ids[0]);
+					World world = SideHelper.getWorld(ids[0]);
 					if (world != null) {
 						return world.getTileEntity(ids[1], ids[2], ids[3]);
 					}
@@ -413,19 +432,19 @@ public class SerializationManager {
 				@Override
 				public Container readInstance(NBTBase nbt) throws Exception {
 					int[] ids = ((NBTTagIntArray) nbt).func_150302_c();
-					World world = ProxyHelper.getWorld(ids[0]);
+					World world = SideHelper.getWorld(ids[0]);
 					if (world != null) {
 						Entity entity = world.getEntityByID(ids[1]);
 						if (entity instanceof EntityPlayer) {
-							return ProxyHelper.getPlayerContainer((EntityPlayer) entity, ids[2]);
+							return SideHelper.getPlayerContainer((EntityPlayer) entity, ids[2]);
 						}
 					}
-					return ProxyHelper.getPlayerContainer(null, ids[2]);
+					return SideHelper.getPlayerContainer(null, ids[2]);
 				}
 
 				@Override
 				public NBTBase writeInstance(Container obj) throws Exception {
-					EntityPlayer player = ProxyHelper.getThePlayer();
+					EntityPlayer player = SideHelper.getThePlayer();
 					if (player != null) {
 						//This is on client. The server needs player to get the Container.
 						return new NBTTagIntArray(new int[] { player.worldObj.provider.dimensionId,
@@ -458,6 +477,26 @@ public class SerializationManager {
 				}
 			};
 			setDataSerializerFor(ItemStack.class, ser);
+		}
+		//network part
+		{
+		    DataSerializer ser = new DataSerializer<NetworkTerminal>() {
+                @Override
+                public NetworkTerminal readData(NBTBase nbt, NetworkTerminal obj) throws Exception {
+                    return NetworkTerminal.fromNBT(nbt);
+                }
+
+                @Override
+                public NBTBase writeData(NetworkTerminal obj) throws Exception {
+                    return obj.toNBT();
+                }
+		    };
+		    setDataSerializerFor(NetworkTerminal.class, ser);
+		}
+		{
+		    Future.FutureSerializer ser = new Future.FutureSerializer();
+            setDataSerializerFor(Future.class, ser);
+            setInstanceSerializerFor(Future.class, ser);
 		}
 	}
 }

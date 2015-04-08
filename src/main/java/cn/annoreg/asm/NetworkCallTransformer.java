@@ -42,7 +42,9 @@ public class NetworkCallTransformer extends ClassVisitor {
                             super.visitMethod(access, name, desc, signature, exceptions),
                             className, name, desc, m.side);
                 case Opcodes.ACC_PUBLIC:
-                    //TODO support for non-static method
+                    return DelegateGenerator.generateNonStaticMethod(
+                            super.visitMethod(access, name, desc, signature, exceptions),
+                            className, name, desc, m.side);
                 default:
                     throw new RuntimeException("Unsupported access flag in network call.");
                 }

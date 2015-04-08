@@ -64,16 +64,4 @@ public class ProxyHelper {
 	public static void regItemRender(Item item, Object obj) {
 		proxy.regItemRender(item, obj);
 	}
-	
-	public static World getWorld(int dimension) {
-		return proxy.getWorld(dimension);
-	}
-	
-	public static Container getPlayerContainer(EntityPlayer player, int windowId) {
-		return proxy.getPlayerContainer(player, windowId);
-	}
-	
-	public static EntityPlayer getThePlayer() {
-		return proxy.getThePlayer();
-	}
 }
