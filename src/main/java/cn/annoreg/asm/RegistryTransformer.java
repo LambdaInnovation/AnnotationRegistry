@@ -36,30 +36,36 @@ public class RegistryTransformer implements IClassTransformer {
 
 	@Override
 	public byte[] transform(String arg0, String arg1, byte[] data) {
-		if (arg0.startsWith("cn.annoreg.")) {
-			return data;
-		}
-		ClassReader cr = new ClassReader(data);
-		
-		//Get inner class list for each class
-		{
-	        InnerClassVisitor cv = new InnerClassVisitor(Opcodes.ASM4);
-	        cr.accept(cv, 0);
-	        List<String> inner = cv.getInnerClassList();
-	        if (inner != null) {
-	            RegistrationManager.INSTANCE.addInnerClassList(arg0, inner);
-	        }
-		}
-		//Transform network-calls for each class
-		{
-		    NetworkCallVisitor cv = new NetworkCallVisitor(Opcodes.ASM4, arg0);
-		    cr.accept(cv, 0);
-	        if (cv.needTransform()) {
-	            ClassWriter cw = new ClassWriter(Opcodes.ASM4);
-	            cr.accept(cv.getTransformer(cw), 0);
-	            data = cw.toByteArray();
-	        }
-		}
+	    if (data == null) return data;
+	    try {
+    		if (arg0.startsWith("cn.annoreg.")) {
+    			return data;
+    		}
+    		ClassReader cr = new ClassReader(data);
+    		
+    		//Get inner class list for each class
+    		{
+    	        InnerClassVisitor cv = new InnerClassVisitor(Opcodes.ASM4);
+    	        cr.accept(cv, 0);
+    	        List<String> inner = cv.getInnerClassList();
+    	        if (inner != null) {
+    	            RegistrationManager.INSTANCE.addInnerClassList(arg0, inner);
+    	        }
+    		}
+    		//Transform network-calls for each class
+    		{
+    		    NetworkCallVisitor cv = new NetworkCallVisitor(Opcodes.ASM4, arg0);
+    		    cr.accept(cv, 0);
+    	        if (cv.needTransform()) {
+    	            ClassWriter cw = new ClassWriter(Opcodes.ASM4);
+    	            cr.accept(cv.getTransformer(cw), 0);
+    	            data = cw.toByteArray();
+    	        }
+    		}
+	    } catch (Throwable t) {
+	        t.printStackTrace();
+	        throw new RuntimeException(t);
+	    }
 		return data;
 	}
 

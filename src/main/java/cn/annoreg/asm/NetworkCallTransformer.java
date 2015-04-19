@@ -36,17 +36,15 @@ public class NetworkCallTransformer extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         for (ClassMethod m : methods) {
             if (m.name == name && m.desc == desc) {
-                switch (access) {
-                case Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC:
+                switch (access & Opcodes.ACC_STATIC) {
+                case Opcodes.ACC_STATIC:
                     return DelegateGenerator.generateStaticMethod(
                             super.visitMethod(access, name, desc, signature, exceptions),
                             className, name, desc, m.side);
-                case Opcodes.ACC_PUBLIC:
+                default:
                     return DelegateGenerator.generateNonStaticMethod(
                             super.visitMethod(access, name, desc, signature, exceptions),
                             className, name, desc, m.side);
-                default:
-                    throw new RuntimeException("Unsupported access flag in network call.");
                 }
             }
         }

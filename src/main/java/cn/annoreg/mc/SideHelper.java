@@ -10,6 +10,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 
 public class SideHelper {
+	//TODO load client on server?
     private static ThreadLocal<SideHelper> threadProxy = new ThreadLocal<SideHelper>() {
         @Override protected SideHelper initialValue() {
             Side s = FMLCommonHandler.instance().getEffectiveSide();
