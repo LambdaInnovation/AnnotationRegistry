@@ -94,16 +94,6 @@ public class SerializationManager {
 				e.printStackTrace();
 				return null;
 			}
-		case ENUM:
-			try {
-				ret.setString("class", clazz.getName());
-				ret.setInteger("ordinal", ((Enum)obj).ordinal());
-				return ret;
-			} catch(Exception e) {
-				ARModContainer.log.error("Failed in enum serialization. Class: {}.", clazz.getCanonicalName());
-				e.printStackTrace();
-				return null;
-			}
 		default:
 			ARModContainer.log.error("Failed in serialization. Class: {}. Unknown option.",
 					clazz.getCanonicalName());
@@ -180,20 +170,6 @@ public class SerializationManager {
 				return null;
 			}
 		}
-		case ENUM:
-		{
-			try {
-				Class enumClass = Class.forName(tag.getString("class"));
-				Object[] objs = (Object[]) enumClass.getMethod("values").invoke(null);
-				
-				return objs[tag.getInteger("ordinal")];
-			} catch(Exception e) {
-				ARModContainer.log.error("Failed in enum deserialization. Class: {}.",
-				        tag.getString("class"));
-				e.printStackTrace();
-				return null;
-			}
-		}
 		default:
 			ARModContainer.log.error("Failed in deserialization. Class: {}. Unknown option.",
 			        tag.getString("class"));
@@ -250,6 +226,34 @@ public class SerializationManager {
 	
 	private void initInternalSerializers() {
 		//First part: java internal class.
+		{
+			InstanceSerializer ser = new InstanceSerializer<Enum>() {
+				@Override
+				public Enum readInstance(NBTBase nbt) throws Exception {
+					NBTTagCompound tag = (NBTTagCompound) nbt;
+					try {
+						Class enumClass = Class.forName(tag.getString("class"));
+						Object[] objs = (Object[]) enumClass.getMethod("values").invoke(null);
+						
+						return (Enum) objs[tag.getInteger("ordinal")];
+					} catch(Exception e) {
+						ARModContainer.log.error("Failed in enum deserialization. Class: {}.",
+						        tag.getString("class"));
+						e.printStackTrace();
+						return null;
+					}
+				}
+
+				@Override
+				public NBTBase writeInstance(Enum obj) throws Exception {
+					NBTTagCompound ret = new NBTTagCompound();
+					ret.setString("class", obj.getClass().getName());
+					ret.setByte("ordinal", (byte) ((Enum)obj).ordinal());
+					return ret;
+				}
+			};
+			setInstanceSerializerFor(Enum.class, ser);
+		}
 		{
 			DataSerializer ser = new DataSerializer<Byte>() {
 				@Override
