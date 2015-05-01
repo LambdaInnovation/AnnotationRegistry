@@ -28,6 +28,9 @@ public class StorageOption {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Update {}
+	
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface Enum {}
 
 	/**
 	 * Used only in server-to-client network call.
@@ -45,6 +48,7 @@ public class StorageOption {
 		DATA,
 		INSTANCE,
 		UPDATE,
+		ENUM,
 		
 		/**
 		 * Used only in deserialization.

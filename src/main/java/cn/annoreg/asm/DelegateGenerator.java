@@ -168,6 +168,8 @@ public class DelegateGenerator {
                     }
                     options[parameter] = StorageOption.Option.INSTANCE;
                     targetIndex = parameter;
+                } else if (type.equals(Type.getType(StorageOption.Enum.class))) {
+                	options[parameter] = StorageOption.Option.ENUM;
                 }
                 return super.visitParameterAnnotation(parameter, desc, visible);
             }
@@ -323,6 +325,8 @@ public class DelegateGenerator {
                     }
                     options[parameter] = StorageOption.Option.INSTANCE;
                     targetIndex = parameter;
+                } else if (type.equals(Type.getType(StorageOption.Enum.class))) {
+                	options[parameter] = StorageOption.Option.ENUM;
                 }
                 return super.visitParameterAnnotation(parameter, desc, visible);
             }
