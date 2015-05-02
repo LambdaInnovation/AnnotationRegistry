@@ -17,13 +17,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import cn.annoreg.ARModContainer;
-import cn.annoreg.mc.ProxyHelper;
-import cn.annoreg.mc.SideHelper;
-import cn.annoreg.mc.network.Future;
-import cn.annoreg.mc.network.NetworkTerminal;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -41,6 +34,13 @@ import net.minecraft.nbt.NBTTagShort;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
+import org.apache.commons.lang3.ArrayUtils;
+
+import cn.annoreg.ARModContainer;
+import cn.annoreg.mc.SideHelper;
+import cn.annoreg.mc.network.Future;
+import cn.annoreg.mc.network.NetworkTerminal;
 
 public class SerializationManager {
 	
@@ -80,7 +80,7 @@ public class SerializationManager {
 				ret.setString("class", i.getClass().getName());
 				return ret;
 			} catch (Exception e) {
-				ARModContainer.log.error("Failed in instance serialization. Class: {}.", clazz.getCanonicalName());
+				ARModContainer.log.error("Failed in instance serialization. Class: {}, Object: {}", clazz.getCanonicalName(), obj.toString());
 				e.printStackTrace();
 				return null;
 			}
@@ -226,6 +226,34 @@ public class SerializationManager {
 	
 	private void initInternalSerializers() {
 		//First part: java internal class.
+		{
+			InstanceSerializer ser = new InstanceSerializer<Enum>() {
+				@Override
+				public Enum readInstance(NBTBase nbt) throws Exception {
+					NBTTagCompound tag = (NBTTagCompound) nbt;
+					try {
+						Class enumClass = Class.forName(tag.getString("class"));
+						Object[] objs = (Object[]) enumClass.getMethod("values").invoke(null);
+						
+						return (Enum) objs[tag.getInteger("ordinal")];
+					} catch(Exception e) {
+						ARModContainer.log.error("Failed in enum deserialization. Class: {}.",
+						        tag.getString("class"));
+						e.printStackTrace();
+						return null;
+					}
+				}
+
+				@Override
+				public NBTBase writeInstance(Enum obj) throws Exception {
+					NBTTagCompound ret = new NBTTagCompound();
+					ret.setString("class", obj.getClass().getName());
+					ret.setByte("ordinal", (byte) ((Enum)obj).ordinal());
+					return ret;
+				}
+			};
+			setInstanceSerializerFor(Enum.class, ser);
+		}
 		{
 			DataSerializer ser = new DataSerializer<Byte>() {
 				@Override
