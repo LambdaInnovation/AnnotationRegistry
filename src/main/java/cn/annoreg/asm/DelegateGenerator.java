@@ -15,6 +15,7 @@ package cn.annoreg.asm;
 import net.minecraft.entity.player.EntityPlayer;
 
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -50,7 +51,7 @@ public class DelegateGenerator {
     
     private static int delegateNextID = 0;
     
-    public static MethodVisitor generateStaticMethod(MethodVisitor parent, 
+    public static MethodVisitor generateStaticMethod(ClassVisitor parentClass, MethodVisitor parent, 
             String className, String methodName, String desc, final Side side) {
         
         //This method is a little bit complicated.
@@ -99,7 +100,8 @@ public class DelegateGenerator {
         
         //Create delegate object.
         final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-        final Type delegateClassType = Type.getType("cn/annoreg/asm/NetworkCallDelegate_" + Integer.toString(delegateNextID++));
+        final String delegateId = Integer.toString(delegateNextID++);
+        final Type delegateClassType = Type.getType("cn/annoreg/asm/NetworkCallDelegate_" + delegateId);
         cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, delegateClassType.getInternalName(), null, 
                 Type.getInternalName(Object.class), new String[]{ Type.getInternalName(NetworkCallDelegate.class) });
         //package cn.annoreg.asm;
@@ -115,6 +117,8 @@ public class DelegateGenerator {
             mv.visitEnd();
         }
         //public NetworkCallDelegate_?() {}
+        
+        final String delegateFunctionName = methodName + "_delegate_" + delegateId; 
         {
             MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, 
                     "invoke", 
@@ -127,23 +131,27 @@ public class DelegateGenerator {
                 mv.visitInsn(Opcodes.AALOAD);
                 mv.visitTypeInsn(Opcodes.CHECKCAST, args[i].getInternalName());
             }
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, delegateClassType.getInternalName(), "delegated", desc);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, 
+                    //delegateClassType.getInternalName(), //changed to original class
+                    className.replace('.', '/'),
+                    delegateFunctionName, desc);
             mv.visitInsn(Opcodes.RETURN);
             mv.visitMaxs(args.length + 2, 2);
             mv.visitEnd();
         }
         //@Override public void invoke(Object[] args) {
-        //    delegated((Type0) args[0], (Type1) args[1], ...);
+        //    xxxx.xxxx_delegated_xxx((Type0) args[0], (Type1) args[1], ...);
         //}
         
         //The returned MethodVisitor will visit the original version of the method,
         //including its annotation, where we can get StorageOptions.
         return new MethodVisitor(Opcodes.ASM4, 
-                cw.visitMethod(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC, "delegated", desc, null, null)) {
+                parentClass.visitMethod(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC, delegateFunctionName, desc, null, null)) {
             
             //Remember storage options for each argument
             StorageOption.Option[] options = new StorageOption.Option[args.length];
             int targetIndex = -1;
+            StorageOption.Target.RangeOption range = StorageOption.Target.RangeOption.SINGLE;
             
             {
                 for (int i = 0; i < options.length; ++i) {
@@ -168,6 +176,13 @@ public class DelegateGenerator {
                     }
                     options[parameter] = StorageOption.Option.INSTANCE;
                     targetIndex = parameter;
+                    return new AnnotationVisitor(this.api, super.visitParameterAnnotation(parameter, desc, visible)) {
+                        @Override
+                        public void visitEnum(String name, String desc, String value) {
+                            super.visitEnum(name, desc, value);
+                            range = StorageOption.Target.RangeOption.valueOf(value);
+                        }
+                    };
                 }
                 return super.visitParameterAnnotation(parameter, desc, visible);
             }
@@ -182,7 +197,7 @@ public class DelegateGenerator {
                     Class<?> clazz = classLoader.defineClass(delegateClassType.getClassName(), cw.toByteArray());
                     NetworkCallDelegate delegateObj = (NetworkCallDelegate) clazz.newInstance(); 
                     if (side == Side.CLIENT) {
-                        NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex);
+                        NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex, range);
                     } else {
                         NetworkCallManager.registerServerDelegateClass(delegateName, delegateObj, options);
                     }
@@ -198,7 +213,7 @@ public class DelegateGenerator {
     }
     
 
-    public static MethodVisitor generateNonStaticMethod(MethodVisitor parent, 
+    public static MethodVisitor generateNonStaticMethod(ClassVisitor parentClass, MethodVisitor parent, 
             String className, String methodName, String desc, final Side side) {
         
         //convert desc to a non-static method form
@@ -252,7 +267,8 @@ public class DelegateGenerator {
 
         //Create delegate object.
         final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-        final Type delegateClassType = Type.getType("cn/annoreg/asm/NetworkCallDelegate_" + Integer.toString(delegateNextID++));
+        final String delegateId = Integer.toString(delegateNextID++);
+        final Type delegateClassType = Type.getType("cn/annoreg/asm/NetworkCallDelegate_" + delegateId);
         cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, delegateClassType.getInternalName(), null, 
                 Type.getInternalName(Object.class), new String[]{ Type.getInternalName(NetworkCallDelegate.class) });
         //package cn.annoreg.asm;
@@ -268,6 +284,8 @@ public class DelegateGenerator {
             mv.visitEnd();
         }
         //public NetworkCallDelegate_?() {}
+        
+        final String delegateMethodName = methodName + "_delegate_" + delegateId;
         {
             MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, 
                     "invoke", 
@@ -280,7 +298,10 @@ public class DelegateGenerator {
                 mv.visitInsn(Opcodes.AALOAD);
                 mv.visitTypeInsn(Opcodes.CHECKCAST, args[i].getInternalName());
             }
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, delegateClassType.getInternalName(), "delegated", nonstaticDesc);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, 
+                    //delegateClassType.getInternalName(), 
+                    className.replace('.', '/'),
+                    delegateMethodName, nonstaticDesc);
             mv.visitInsn(Opcodes.RETURN);
             mv.visitMaxs(args.length + 2, 2);
             mv.visitEnd();
@@ -292,11 +313,12 @@ public class DelegateGenerator {
         //The returned MethodVisitor will visit the original version of the method,
         //including its annotation, where we can get StorageOptions.
         return new MethodVisitor(Opcodes.ASM4, 
-                cw.visitMethod(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC, "delegated", nonstaticDesc, null, null)) {
+                parentClass.visitMethod(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC, delegateMethodName, nonstaticDesc, null, null)) {
             
             //Remember storage options for each argument
             StorageOption.Option[] options = new StorageOption.Option[args.length];
             int targetIndex = -1;
+            StorageOption.Target.RangeOption range = StorageOption.Target.RangeOption.SINGLE;
             
             {
                 for (int i = 0; i < options.length; ++i) {
@@ -323,6 +345,13 @@ public class DelegateGenerator {
                     }
                     options[parameter] = StorageOption.Option.INSTANCE;
                     targetIndex = parameter;
+                    return new AnnotationVisitor(this.api, super.visitParameterAnnotation(parameter, desc, visible)) {
+                        @Override
+                        public void visitEnum(String name, String desc, String value) {
+                            super.visitEnum(name, desc, value);
+                            range = StorageOption.Target.RangeOption.valueOf(value);
+                        }
+                    };
                 }
                 return super.visitParameterAnnotation(parameter, desc, visible);
             }
@@ -339,7 +368,7 @@ public class DelegateGenerator {
                     Class<?> clazz = classLoader.defineClass(delegateClassType.getClassName(), cw.toByteArray());
                     NetworkCallDelegate delegateObj = (NetworkCallDelegate) clazz.newInstance(); 
                     if (side == Side.CLIENT) {
-                        NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex);
+                        NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex, range);
                     } else {
                         NetworkCallManager.registerServerDelegateClass(delegateName, delegateObj, options);
                     }

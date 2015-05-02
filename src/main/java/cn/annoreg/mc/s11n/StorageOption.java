@@ -38,7 +38,15 @@ public class StorageOption {
 	 *
 	 */
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Target {}
+    public @interface Target {
+        
+        public enum RangeOption {
+            SINGLE,
+            EXCEPT,
+        }
+        
+        RangeOption range() default RangeOption.SINGLE;
+    }
 	
 	public enum Option {
 	    NULL,

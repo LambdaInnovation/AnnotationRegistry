@@ -28,8 +28,10 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import cn.annoreg.ARModContainer;
+import cn.annoreg.mc.SideHelper;
 import cn.annoreg.mc.s11n.SerializationManager;
 import cn.annoreg.mc.s11n.StorageOption;
+import cn.annoreg.mc.s11n.StorageOption.Target.RangeOption;
 
 public class NetworkCallManager {
     
@@ -108,7 +110,7 @@ public class NetworkCallManager {
     }
     
     public static void registerClientDelegateClass(final String delegateName, NetworkCallDelegate delegate,
-            final StorageOption.Option[] options, final int targetIndex) {
+            final StorageOption.Option[] options, final int targetIndex, final RangeOption range) {
         callerMap.put(delegateName, new Caller() {
             @Override
             public void invoke(Object[] args) {
@@ -123,9 +125,16 @@ public class NetworkCallManager {
                 }
                 if (targetIndex == -1) {
                     netHandler.sendToAll(new NetworkCallMessage(delegateName, params));
-                } else {
+                } else if (range == RangeOption.SINGLE) {
                     EntityPlayerMP playerTarget = (EntityPlayerMP) args[targetIndex];
                     netHandler.sendTo(new NetworkCallMessage(delegateName, params), playerTarget);
+                } else {
+                    EntityPlayerMP playerTarget = (EntityPlayerMP) args[targetIndex];
+                    for (Object p : SideHelper.getPlayerList()) {
+                        if (p != null && p instanceof EntityPlayerMP && p != playerTarget) {
+                            netHandler.sendTo(new NetworkCallMessage(delegateName, params), (EntityPlayerMP) p);
+                        }
+                    }
                 }
             }
         });

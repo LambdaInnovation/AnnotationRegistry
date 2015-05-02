@@ -44,6 +44,10 @@ public class SideHelper {
         return threadProxy.get().proxy.getPlayerOnServer(name);
     }
     
+    public static Object[] getPlayerList() {
+        return threadProxy.get().proxy.getPlayerList();
+    }
+    
     public static boolean isClient() {
         return FMLCommonHandler.instance().getEffectiveSide().isClient();
     }

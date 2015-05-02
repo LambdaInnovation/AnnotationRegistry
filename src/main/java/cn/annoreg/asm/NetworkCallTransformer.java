@@ -39,10 +39,12 @@ public class NetworkCallTransformer extends ClassVisitor {
                 switch (access & Opcodes.ACC_STATIC) {
                 case Opcodes.ACC_STATIC:
                     return DelegateGenerator.generateStaticMethod(
+                            this,
                             super.visitMethod(access, name, desc, signature, exceptions),
                             className, name, desc, m.side);
                 default:
                     return DelegateGenerator.generateNonStaticMethod(
+                            this,
                             super.visitMethod(access, name, desc, signature, exceptions),
                             className, name, desc, m.side);
                 }

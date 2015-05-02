@@ -74,4 +74,9 @@ public class ClientProxy extends ServerProxy {
     public EntityPlayer getPlayerOnServer(String name) {
         return null;
     }
+    
+    @Override
+    public Object[] getPlayerList() {
+        return new Object[] {};
+    }
 }
