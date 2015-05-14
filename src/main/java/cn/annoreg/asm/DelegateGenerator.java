@@ -69,7 +69,7 @@ public class DelegateGenerator {
         for (Type t : args) {
             //TODO support these types
             if (!t.getDescriptor().startsWith("L") && !t.getDescriptor().startsWith("[")) {
-                throw new RuntimeException("Unsupported argument type in network call. ");
+                throw new RuntimeException("Unsupported argument type in network call. in method " + methodName + ", " + t.getDescriptor());
             }
         }
         if (!ret.equals(Type.VOID_TYPE)) {

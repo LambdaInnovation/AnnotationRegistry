@@ -55,6 +55,11 @@ public class SerializationManager {
 	private Map<String, InstanceSerializer> instanceSerializersFromId = new HashMap();
 
 	public NBTBase serialize(Object obj, StorageOption.Option option) {
+		if(obj == null) { //Allow to pass over null instances.
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setBoolean("__isNull__", true);
+			return tag;
+		}
 		Class clazz = obj.getClass();
 		DataSerializer d = getDataSerializer(clazz);
 		InstanceSerializer i = getInstanceSerializer(clazz);
@@ -105,6 +110,10 @@ public class SerializationManager {
 	//use null in obj if the instance is unknown.
 	public Object deserialize(Object obj, NBTBase nbt, StorageOption.Option option) {
 		NBTTagCompound tag = (NBTTagCompound) nbt;
+		if(tag.getBoolean("__isNull__")) {
+			return null;
+		}
+		
 		if (option == StorageOption.Option.AUTO) {
 		    option = StorageOption.Option.values()[tag.getInteger("option")];
 		}
@@ -414,7 +423,40 @@ public class SerializationManager {
 			};
 			setDataSerializerFor(String.class, ser);
 		}
+		{
+			//TODO: Maybe there is a more data-friendly method?
+			DataSerializer ser = new DataSerializer<Boolean>() {
+				@Override
+				public Boolean readData(NBTBase nbt, Boolean obj) throws Exception {
+					return ((NBTTagCompound)nbt).getBoolean("v");
+				}
+
+				@Override
+				public NBTBase writeData(Boolean obj) throws Exception {
+					NBTTagCompound tag = new NBTTagCompound();
+					tag.setBoolean("v", obj);
+					return tag;
+				}
+			};
+			setDataSerializerFor(Boolean.class, ser);
+			setDataSerializerFor(Boolean.TYPE, ser);
+		}
+		
 		//Second part: Minecraft objects.
+		{
+			DataSerializer ser = new DataSerializer<NBTTagCompound>() {
+				@Override
+				public NBTTagCompound readData(NBTBase nbt, NBTTagCompound obj) throws Exception {
+					return (NBTTagCompound) nbt;
+				}
+
+				@Override
+				public NBTBase writeData(NBTTagCompound obj) throws Exception {
+					return obj;
+				}
+			};
+			setDataSerializerFor(NBTTagCompound.class, ser);
+		}
 		{
 			InstanceSerializer ser = new InstanceSerializer<Entity>() {
 				@Override
