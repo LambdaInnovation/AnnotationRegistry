@@ -19,7 +19,7 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Type;
 
-import cn.annoreg.core.RegistrationClass;
+import cn.annoreg.core.Registrant;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -52,7 +52,7 @@ public class InnerClassVisitor extends ClassVisitor {
                 }
             };
         }
-        if (desc.equals(Type.getDescriptor(RegistrationClass.class))) {
+        if (desc.equals(Type.getDescriptor(Registrant.class))) {
             isReg = true;
         }
         return null;

@@ -79,7 +79,7 @@ public class ARModContainer extends DummyModContainer {
     	//This must be done before PreInit stage.
     	ASMDataTable dt = event.getASMHarvestedData();
     	RegistrationManager.INSTANCE.addRegistryTypes(dt.getAll("cn.annoreg.core.RegistryTypeDecl"));
-    	RegistrationManager.INSTANCE.annotationList(dt.getAll("cn.annoreg.core.RegistrationClass"));
+    	RegistrationManager.INSTANCE.annotationList(dt.getAll("cn.annoreg.core.Registrant"));
     	RegistrationManager.INSTANCE.addAnnotationMod(dt.getAll("cn.annoreg.core.RegistrationMod"));
     }
 

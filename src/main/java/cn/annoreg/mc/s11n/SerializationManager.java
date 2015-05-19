@@ -12,6 +12,7 @@
  */
 package cn.annoreg.mc.s11n;
 
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,6 +30,7 @@ import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagFloat;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagIntArray;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.nbt.NBTTagShort;
 import net.minecraft.nbt.NBTTagString;
@@ -567,6 +569,28 @@ public class SerializationManager {
 		    Future.FutureSerializer ser = new Future.FutureSerializer();
             setDataSerializerFor(Future.class, ser);
             setInstanceSerializerFor(Future.class, ser);
+		}
+		//misc
+		{
+			DataSerializer ser = new DataSerializer<BitSet>() {
+
+				@Override
+				public BitSet readData(NBTBase nbt, BitSet obj)
+						throws Exception {
+					NBTTagCompound tag = (NBTTagCompound) nbt;
+					BitSet ret = BitSet.valueOf(tag.getByteArray("l"));
+					return ret;
+				}
+
+				@Override
+				public NBTBase writeData(BitSet obj) throws Exception {
+					NBTTagCompound tag = new NBTTagCompound();
+					byte[] barray = obj.toByteArray();
+					tag.setByteArray("l", barray);
+					return tag;
+				}
+				
+			};
 		}
 	}
 }
