@@ -591,6 +591,8 @@ public class SerializationManager {
 				}
 				
 			};
+			
+			setDataSerializerFor(BitSet.class, ser);
 		}
 	}
 }
