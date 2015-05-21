@@ -17,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -292,6 +293,12 @@ public class DelegateGenerator {
                     Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(Object[].class)),
                     null, null);
             mv.visitCode();
+            
+            //check if this is null
+            mv.visitVarInsn(Opcodes.ALOAD, 0);
+            Label lblEnd = new Label();
+            mv.visitJumpInsn(Opcodes.IFNONNULL, lblEnd);
+            
             for (int i = 0; i < args.length; ++i) {
                 mv.visitVarInsn(Opcodes.ALOAD, 1); //0 is this
                 pushIntegerConst(mv, i);
@@ -302,6 +309,9 @@ public class DelegateGenerator {
                     //delegateClassType.getInternalName(), 
                     className.replace('.', '/'),
                     delegateMethodName, nonstaticDesc);
+            
+            mv.visitLabel(lblEnd);
+            
             mv.visitInsn(Opcodes.RETURN);
             mv.visitMaxs(args.length + 2, 2);
             mv.visitEnd();
