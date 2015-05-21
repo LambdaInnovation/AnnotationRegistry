@@ -100,7 +100,7 @@ public class RegistryHelper {
 				}
 			}
 		}
-		throw new RuntimeException("Can not get field from mod class: field not found.");
+		throw new RuntimeException("Can not get field from mod " + clazz + ": field not found.");
 	}
 	
 	public final Object getFieldFromObject(Object obj, Class<? extends Annotation> anno) {

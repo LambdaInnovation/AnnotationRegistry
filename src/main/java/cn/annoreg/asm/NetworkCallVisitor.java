@@ -23,7 +23,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 import cpw.mods.fml.relauncher.Side;
-import cn.annoreg.core.RegistrationClass;
+import cn.annoreg.core.Registrant;
 import cn.annoreg.mc.network.NetworkCallManager;
 import cn.annoreg.mc.network.RegNetworkCall;
 
@@ -65,7 +65,7 @@ public class NetworkCallVisitor extends ClassVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        if (desc.equals(Type.getDescriptor(RegistrationClass.class))) {
+        if (desc.equals(Type.getDescriptor(Registrant.class))) {
             isReg = true;
         }
         return null;

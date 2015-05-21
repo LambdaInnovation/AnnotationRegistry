@@ -23,7 +23,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 import cpw.mods.fml.relauncher.Side;
-import cn.annoreg.core.RegistrationClass;
+import cn.annoreg.core.Registrant;
 import cn.annoreg.core.RegistrationManager;
 import net.minecraft.launchwrapper.IClassTransformer;
 
