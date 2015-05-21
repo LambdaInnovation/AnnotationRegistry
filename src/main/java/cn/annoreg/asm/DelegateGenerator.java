@@ -297,7 +297,7 @@ public class DelegateGenerator {
             //check if this is null
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             Label lblEnd = new Label();
-            mv.visitJumpInsn(Opcodes.IFNONNULL, lblEnd);
+            mv.visitJumpInsn(Opcodes.IFNULL, lblEnd);
             
             for (int i = 0; i < args.length; ++i) {
                 mv.visitVarInsn(Opcodes.ALOAD, 1); //0 is this
