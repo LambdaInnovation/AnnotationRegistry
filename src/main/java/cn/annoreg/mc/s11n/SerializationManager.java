@@ -13,6 +13,7 @@
 package cn.annoreg.mc.s11n;
 
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,6 +57,7 @@ public class SerializationManager {
 	private Map<Class, InstanceSerializer> instanceSerializers = new HashMap();
 	private Map<String, InstanceSerializer> instanceSerializersFromId = new HashMap();
 
+	// should only return NBTTagCompound
 	public NBTBase serialize(Object obj, StorageOption.Option option) {
 		if(obj == null) { //Allow to pass over null instances.
 			NBTTagCompound tag = new NBTTagCompound();
@@ -73,6 +75,21 @@ public class SerializationManager {
 		    return ret;
 		case DATA:
 			try {
+			    if (d == null) {
+			        if (obj instanceof Collection) {
+			            Collection coll = (Collection) obj;
+			            NBTTagList list = new NBTTagList();
+			            for (Object element : coll) {
+			                list.appendTag(serialize(obj, StorageOption.Option.DATA));
+			            }
+			            ret.setBoolean("__isCollection__", true);
+			            ret.setTag("collection", list);
+			            return ret;
+			        } else {
+			            throw new RuntimeException("Serializer not found.");
+			        }
+			    }
+			    
 				ret.setTag("data", d.writeData(obj));
 				return ret;
 			} catch (Exception e) {
@@ -82,6 +99,21 @@ public class SerializationManager {
 			}
 		case INSTANCE:
 			try {
+                if (i == null) {
+                    if (obj instanceof Collection) {
+                        Collection coll = (Collection) obj;
+                        NBTTagList list = new NBTTagList();
+                        for (Object element : coll) {
+                            list.appendTag(serialize(obj, StorageOption.Option.INSTANCE));
+                        }
+                        ret.setBoolean("__isCollection__", true);
+                        ret.setTag("collection", list);
+                        return ret;
+                    } else {
+                        throw new RuntimeException("Serializer not found.");
+                    }
+                }
+                
 				ret.setTag("instance", i.writeInstance(obj));
 				//we need to remember the class of i (also the id of i), not of obj.
 				ret.setString("class", i.getClass().getName());
@@ -93,6 +125,9 @@ public class SerializationManager {
 			}
 		case UPDATE:
 			try {
+			    if (i == null || d == null) {
+			        throw new RuntimeException("Serializer not found.");
+			    }
 				ret.setTag("instance", i.writeInstance(obj));
 				ret.setTag("data", d.writeData(obj));
 				return ret;
@@ -112,8 +147,26 @@ public class SerializationManager {
 	//use null in obj if the instance is unknown.
 	public Object deserialize(Object obj, NBTBase nbt, StorageOption.Option option) {
 		NBTTagCompound tag = (NBTTagCompound) nbt;
+        Class<?> clazz = null;
+        
 		if(tag.getBoolean("__isNull__")) {
 			return null;
+		}
+		if (tag.getBoolean("__isCollection__")) {
+		    //create the container
+            try {
+                clazz = Class.forName(tag.getString("class"));
+                Collection coll = (Collection) clazz.newInstance();
+                NBTTagList nbtcoll = (NBTTagList) tag.getTag("collection");
+                for (int i = 0; i < nbtcoll.tagCount(); ++i) {
+                    coll.add(deserialize(null, nbtcoll.getCompoundTagAt(i), option));
+                }
+                return coll;
+            } catch (Exception e) {
+                ARModContainer.log.error("Failed in deserialization. Class: {}.", tag.getString("class"));
+                e.printStackTrace();
+                return null;
+            }
 		}
 		
 		if (option == StorageOption.Option.AUTO) {
@@ -123,7 +176,6 @@ public class SerializationManager {
 			ARModContainer.log.error("Failed in deserialization. Class: {}.", tag.getString("class"));
 			Thread.dumpStack();
 		}
-		Class<?> clazz = null;
 		NBTBase data = tag.getTag("data");
 		NBTBase ins = tag.getTag("instance");
 		switch (option) {
@@ -193,7 +245,7 @@ public class SerializationManager {
 	    //We need to search for super classes
 	    Class c = clazz;
 	    while (c != null) {
-	        InstanceSerializer<T> ret =instanceSerializers.get(c);
+	        InstanceSerializer<T> ret = instanceSerializers.get(c);
 	        if (ret != null) {
 	            return ret;
 	        }
