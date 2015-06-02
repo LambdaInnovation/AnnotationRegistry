@@ -133,7 +133,12 @@ public class NetworkCallManager {
                     netHandler.sendToAll(new NetworkCallMessage(delegateName, params));
                 } else if (range == RangeOption.SINGLE) {
                     EntityPlayerMP playerTarget = (EntityPlayerMP) args[targetIndex];
-                    netHandler.sendTo(new NetworkCallMessage(delegateName, params), playerTarget);
+                    //FIXME: Workaround for NULL player instance
+                    if(playerTarget != null) {
+                    	netHandler.sendTo(new NetworkCallMessage(delegateName, params), playerTarget);
+                    } else {
+                    	ARModContainer.log.error("NULL EntityPlayerMP par: Sending failed.");
+                    }
                 } else {
                     EntityPlayerMP playerTarget = (EntityPlayerMP) args[targetIndex];
                     for (Object p : SideHelper.getPlayerList()) {

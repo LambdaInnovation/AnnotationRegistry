@@ -28,7 +28,7 @@ public class ItemRegistration extends RegistrationFieldSimple<RegItem, Item> {
 
 	public ItemRegistration() {
 		super(RegItem.class, "Item");
-		this.setLoadStage(LoadStage.INIT);
+		this.setLoadStage(LoadStage.PRE_INIT);
 		
 		this.addWork(RegItem.OreDict.class, new PostWork<RegItem.OreDict, Item>() {
 			@Override

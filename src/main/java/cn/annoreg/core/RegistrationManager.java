@@ -179,6 +179,7 @@ public class RegistrationManager {
                 addRegType(rt);
             } catch (Exception e) {
                 ARModContainer.log.warn("Error on adding registry type {}.", asm.getClassName()); //TODO side only type will go here
+                e.printStackTrace();
             }
         }
         unloadedRegType.clear();
