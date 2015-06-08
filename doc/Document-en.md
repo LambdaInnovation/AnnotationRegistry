@@ -30,7 +30,7 @@ package cn.example;
 @RegistrationMod(pkg = "cn.example", res = "example", prefix = "ex_")
 class ExampleMod {
 ```
-Let's explain the @RegistrationMod annotation's parameters.
+Let's explain the ```@RegistrationMod``` annotation's parameters.
 
 pkg: The common package name of all classes, used to identify the class's belonged mod. This field should never collide with other mods that uses AnnoReg. (a.k.a, use unique package name for your mod, not globally-used ones)
 
@@ -39,14 +39,14 @@ res：The resource namespace that this mod uses. Used to setup Item and Block's 
 prefix: emittable, using empty string for default. Used in some cases that consists of a automatically-generated ID. You can use this to avoid name collision with other mods. Notice that the names mentioned here only will be used when they doesn't matter much. Important discriminators and other won't be generated this way.
 
 2 Creat a class with stuffs to register
-You can contain registration information in arbitary many classes, but these classes must all be populated with ```@RegistrationClass```, so AnnoReg can acquire the registration information in begin loading stages. When you want to reg stuffs in internal classes, you just have to annotate the topmost class, all subclasses will be automatically scanned.
+You can contain registration information in arbitary many classes, but these classes must all be populated with ```@Registant```, so AnnoReg can acquire the registration information in begin loading stages. When you want to reg stuffs in internal classes, you just have to annotate the topmost class, all subclasses will be automatically scanned.
 e.g. Use a single class to handle all the machine block instances within your mod:
 
 ```java
 package cn.example;
 //in cn.example package, this belongs to the ExampleMod mentioned above.
 
-@RegistationClass //This class needs to be scanned!
+@Registrant //This class needs to be scanned!
 class MachineBlocks {
     //Contains registration info...
 }
@@ -56,7 +56,7 @@ class MachineBlocks {
 
 Different registration annotations are used differently. E.g. the following code registers a BlockTestMachine instance:
 ```java
-@RegistationClass
+@Registrant
 class MachineBlocks {
     @RegBlock
     public static BlockTestMachine testMachine = new BlockTestMachine();
