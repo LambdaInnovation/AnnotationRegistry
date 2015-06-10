@@ -56,7 +56,7 @@ public class ARModContainer extends DummyModContainer {
 	private static ModMetadata getModMetadata() {
         HashMap def = new HashMap();
         def.put("name", MODID);
-        def.put("version", "2.0a1");
+        def.put("version", "2.0a2");
         return AnnoRegCorePlugin.mc.getMetadataForId(MODID, def);
 	}
 	
