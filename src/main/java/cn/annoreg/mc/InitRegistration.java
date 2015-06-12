@@ -24,20 +24,20 @@ import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 
 @RegistryTypeDecl
-public class SubmoduleInitRegistration extends RegistrationClassOrField<RegSubmoduleInit> {
+public class InitRegistration extends RegistrationClassOrField<RegInit> {
 
-	public SubmoduleInitRegistration() {
-		super(RegSubmoduleInit.class, "SubmoduleInit");
+	public InitRegistration() {
+		super(RegInit.class, "SubmoduleInit");
 		this.setLoadStage(LoadStage.INIT);
 	}
 	
-	private boolean onSide(RegSubmoduleInit anno) {
+	private boolean onSide(RegInit anno) {
 		return FMLCommonHandler.instance().getSide().isClient() ||
-				anno.side() != RegSubmoduleInit.Side.CLIENT_ONLY;
+				anno.side() != RegInit.Side.CLIENT_ONLY;
 	}
 
 	@Override
-	protected void register(Class<?> value, RegSubmoduleInit anno) throws Exception {
+	protected void register(Class<?> value, RegInit anno) throws Exception {
 		if (!onSide(anno))
 			return;
 		Method method = value.getDeclaredMethod("init");
@@ -45,7 +45,7 @@ public class SubmoduleInitRegistration extends RegistrationClassOrField<RegSubmo
 	}
 
 	@Override
-	protected void register(Object value, RegSubmoduleInit anno, String field) throws Exception {
+	protected void register(Object value, RegInit anno, String field) throws Exception {
 		if (!onSide(anno))
 			return;
 		Method method = value.getClass().getDeclaredMethod("init");
