@@ -17,22 +17,20 @@ import io.netty.buffer.ByteBuf;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import cn.annoreg.ARModContainer;
+import cn.annoreg.mc.SideHelper;
+import cn.annoreg.mc.s11n.SerializationManager;
+import cn.annoreg.mc.s11n.StorageOption;
+import cn.annoreg.mc.s11n.StorageOption.Target.RangeOption;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
-import cn.annoreg.ARModContainer;
-import cn.annoreg.mc.SideHelper;
-import cn.annoreg.mc.s11n.SerializationManager;
-import cn.annoreg.mc.s11n.StorageOption;
-import cn.annoreg.mc.s11n.StorageOption.Target.RangeOption;
-import cn.liutils.core.LIUtils;
 
 public class NetworkCallManager {
     
@@ -124,7 +122,7 @@ public class NetworkCallManager {
                 for (int i = 0; i < args.length; ++i) {
                 	NBTTagCompound tag = (NBTTagCompound) SerializationManager.INSTANCE.serialize(args[i], options[i]);
                 	if(tag == null) {
-                		LIUtils.log.fatal("Serialization error while processing arg " + i + " (" + args[i] + "," + options[i] + ")");
+                		ARModContainer.log.fatal("Serialization error while processing arg " + i + " (" + args[i] + "," + options[i] + ")");
                 		throw new RuntimeException();
                 	}
                     params.appendTag(SerializationManager.INSTANCE.serialize(args[i], options[i]));
