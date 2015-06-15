@@ -37,7 +37,7 @@ Entity
 ---
 在Entity的继承类上使用```@RegEntity```。可以使用```@RegEntity.HasRender```和```@RegEntity.Render```联合指定Renderer，例如：
 ```java
-@RegistrationClass
+@Registrant
 @RegEntity
 @RegEntity.HasRender
 public class MyEntity extends Entity {
@@ -81,12 +81,12 @@ public class Resources {
 }
 ```
 
-SubmoduleInit
+Init
 ---
 在Mod的init时向其他class发送一个init指令。可以用在类上（调用public static的init函数）或字段上（调用public的init函数）例如：
 ```java
 @RegistrationClass
-@RegSubmoduleInit
+@RegInit
 class MySubmodule {
     public static void init() {
         //这个函数会在init阶段被调用
@@ -106,7 +106,7 @@ GuiHandler
 ---
 在以GuiHandlerBase的继承类为类型的字段上使用```@RegGuiHandler```。要实现功能，需要实现GuiHandlerBase中getClientGui，或者getClientContainer和getServerContainer函数。前者使GuiHandlerBase可以开启一个基于Container的Gui，后者则可以开启一个仅存在于客户端的Gui。例如用在AcademyCraft中的：
 ```java
-@RegistrationClass
+@Registrant
 public class GuiHandlers {
 	
 	@RegGuiHandler
