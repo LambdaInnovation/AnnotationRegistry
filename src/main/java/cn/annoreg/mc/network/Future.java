@@ -1,21 +1,25 @@
 package cn.annoreg.mc.network;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import io.netty.buffer.ByteBuf;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import cn.annoreg.core.Registrant;
+import cn.annoreg.mc.RegInit;
+import cn.annoreg.mc.s11n.DataSerializer;
+import cn.annoreg.mc.s11n.InstanceSerializer;
+import cn.annoreg.mc.s11n.SerializationManager;
+import cn.annoreg.mc.s11n.StorageOption;
 import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import cn.annoreg.mc.s11n.DataSerializer;
-import cn.annoreg.mc.s11n.InstanceSerializer;
-import cn.annoreg.mc.s11n.SerializationManager;
-import cn.annoreg.mc.s11n.StorageOption;
 
 /**
  * A wrapper for a returned object for network call.
@@ -23,6 +27,14 @@ import cn.annoreg.mc.s11n.StorageOption;
  *
  */
 public final class Future {
+	
+	static SimpleNetworkWrapper wrapper;
+	
+	public static void init() {
+		wrapper = NetworkRegistry.INSTANCE.newSimpleChannel("core_ar_futuresync");
+		wrapper.registerMessage(FutureSyncMessageHandler.class, FutureSyncMessage.class, 1, Side.SERVER);
+        wrapper.registerMessage(FutureSyncMessageHandler.class, FutureSyncMessage.class, 2, Side.CLIENT);
+	}
     
     public static interface FutureCallback {
         /**
@@ -180,12 +192,6 @@ public final class Future {
     }
     
     public static class FutureSyncMessage implements IMessage {
-        
-        private static final SimpleNetworkWrapper wrapper = new SimpleNetworkWrapper("core_ar_futuresync");
-        static {
-            wrapper.registerMessage(FutureSyncMessageHandler.class, FutureSyncMessage.class, 1, Side.SERVER);
-            wrapper.registerMessage(FutureSyncMessageHandler.class, FutureSyncMessage.class, 2, Side.CLIENT);
-        }
         
         public NetworkTerminal target; //only used in send
         

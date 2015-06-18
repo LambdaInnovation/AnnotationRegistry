@@ -24,6 +24,7 @@ public final class NetworkTerminal {
     }
     
     public void send(SimpleNetworkWrapper wrapper, IMessage msg) {
+    	
         if (playerName == null) {
             //send to server
             if (!SideHelper.isClient()) {

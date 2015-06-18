@@ -52,6 +52,7 @@ public class ServerProxy {
 	}
 	
 	public EntityPlayer getPlayerOnServer(String name) {
+		System.out.println(MinecraftServer.getServer().getConfigurationManager().func_152612_a(name));
 	    return MinecraftServer.getServer().getConfigurationManager().func_152612_a(name);
 	}
 	
