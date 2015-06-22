@@ -41,13 +41,13 @@ class ExampleMod {
 
 2 创建包括注册信息的class
 
-注册信息可以包括在任意多个class中，但是这些class必须使用```@RegistationClass```注解，这样在扫描阶段就能获得这些类中的注册信息了。在包括子类的情况下，只需要在最顶层class使用即可，所有的子类会自动被扫描。例如使用一个单独的class来管理机器的方块：
+注册信息可以包括在任意多个class中，但是这些class必须使用```@Registrant```注解，这样在扫描阶段就能获得这些类中的注册信息了。在包括子类的情况下，只需要在最顶层class使用即可，所有的子类会自动被扫描。例如使用一个单独的class来管理机器的方块：
 
 ```java
 package cn.example;
 //在cn.example包中，可以顺利归属到ExampleMod中。
 
-@RegistationClass //这个类包含注册信息
+@Registrant //这个类包含注册信息
 class MachineBlocks {
     //这里是注册信息
 }
@@ -57,7 +57,7 @@ class MachineBlocks {
 
 不同的注册类型有不同的使用方法。例如要注册一个Block，可以使用下面的代码：
 ```java
-@RegistationClass
+@Registrant
 class MachineBlocks {
     @RegBlock
     public static BlockTestMachine testMachine = new BlockTestMachine();

@@ -17,22 +17,21 @@ import io.netty.buffer.ByteBuf;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import cn.annoreg.ARModContainer;
+import cn.annoreg.mc.SideHelper;
+import cn.annoreg.mc.s11n.NullInstanceException;
+import cn.annoreg.mc.s11n.SerializationManager;
+import cn.annoreg.mc.s11n.StorageOption;
+import cn.annoreg.mc.s11n.StorageOption.Target.RangeOption;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
-import cn.annoreg.ARModContainer;
-import cn.annoreg.mc.SideHelper;
-import cn.annoreg.mc.s11n.SerializationManager;
-import cn.annoreg.mc.s11n.StorageOption;
-import cn.annoreg.mc.s11n.StorageOption.Target.RangeOption;
-import cn.liutils.core.LIUtils;
 
 public class NetworkCallManager {
     
@@ -80,9 +79,14 @@ public class NetworkCallManager {
             //Get objects from message
             NBTTagList nbtList = message.params;
             Object[] params = new Object[nbtList.tagCount()];
-            for (int i = 0; i < params.length; ++i) {
-                //TODO removeTag is the only way to get a tag at the given index?
-                params[i] = SerializationManager.INSTANCE.deserialize(null, nbtList.removeTag(0), StorageOption.Option.AUTO);
+            try {
+                for (int i = 0; i < params.length; ++i) {
+                    //TODO removeTag is the only way to get a tag at the given index?
+                    params[i] = SerializationManager.INSTANCE.deserialize(null, nbtList.removeTag(0), StorageOption.Option.AUTO);
+                }
+            } catch (NullInstanceException e) {
+                //null check failed, cancel.
+                return null;
             }
             delegate.invoke(params);
             return null;
@@ -124,7 +128,7 @@ public class NetworkCallManager {
                 for (int i = 0; i < args.length; ++i) {
                 	NBTTagCompound tag = (NBTTagCompound) SerializationManager.INSTANCE.serialize(args[i], options[i]);
                 	if(tag == null) {
-                		LIUtils.log.fatal("Serialization error while processing arg " + i + " (" + args[i] + "," + options[i] + ")");
+                		ARModContainer.log.fatal("Serialization error while processing arg " + i + " (" + args[i] + "," + options[i] + ")");
                 		throw new RuntimeException();
                 	}
                     params.appendTag(SerializationManager.INSTANCE.serialize(args[i], options[i]));
@@ -133,7 +137,12 @@ public class NetworkCallManager {
                     netHandler.sendToAll(new NetworkCallMessage(delegateName, params));
                 } else if (range == RangeOption.SINGLE) {
                     EntityPlayerMP playerTarget = (EntityPlayerMP) args[targetIndex];
-                    netHandler.sendTo(new NetworkCallMessage(delegateName, params), playerTarget);
+                    //FIXME: Workaround for NULL player instance
+                    if(playerTarget != null) {
+                    	netHandler.sendTo(new NetworkCallMessage(delegateName, params), playerTarget);
+                    } else {
+                    	ARModContainer.log.error("NULL EntityPlayerMP par: Sending failed.");
+                    }
                 } else {
                     EntityPlayerMP playerTarget = (EntityPlayerMP) args[targetIndex];
                     for (Object p : SideHelper.getPlayerList()) {

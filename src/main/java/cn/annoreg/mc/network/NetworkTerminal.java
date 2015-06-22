@@ -1,5 +1,6 @@
 package cn.annoreg.mc.network;
 
+import cn.annoreg.ARModContainer;
 import cn.annoreg.mc.SideHelper;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
@@ -23,15 +24,16 @@ public final class NetworkTerminal {
     }
     
     public void send(SimpleNetworkWrapper wrapper, IMessage msg) {
+    	
         if (playerName == null) {
             //send to server
             if (!SideHelper.isClient()) {
-                throw new RuntimeException("Can not send to server from server");
+            	ARModContainer.log.warn("Can not send to server from server");
             }
             wrapper.sendToServer(msg);
         } else {
             if (SideHelper.isClient()) {
-                throw new RuntimeException("Can not send to client from client");
+                ARModContainer.log.warn("Can not send to client from client");
             }
             wrapper.sendTo(msg, (EntityPlayerMP) SideHelper.getPlayerOnServer(playerName));
         }

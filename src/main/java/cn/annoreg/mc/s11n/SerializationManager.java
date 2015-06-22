@@ -202,18 +202,37 @@ public class SerializationManager {
 		}
 		case INSTANCE:
 		{
-			//InstanceSerializer ser = getInstanceSerializer(clazz);
 		    InstanceSerializer ser = instanceSerializersFromId.get(tag.getString("class"));
 			try {
 	            if (ser == null)
 	                throw new RuntimeException("Can not find instance serializer with id " + tag.getString("class"));
-				return ser.readInstance(ins);
+				Object ret = ser.readInstance(ins);
+				if (ret == null) {
+				    throw new NullInstanceException();
+				}
+				return ret;
+			} catch (NullInstanceException e) {
+			    throw e;
 			} catch (Exception e) {
 				ARModContainer.log.error("Failed in instance deserialization. Class: {}.",
 				        tag.getString("class"));
 				e.printStackTrace();
-				return null;
+				throw new RuntimeException(e);
 			}
+		}
+		case NULLABLE_INSTANCE:
+		{
+            InstanceSerializer ser = instanceSerializersFromId.get(tag.getString("class"));
+            try {
+                if (ser == null)
+                    throw new RuntimeException("Can not find instance serializer with id " + tag.getString("class"));
+                return ser.readInstance(ins);
+            } catch (Exception e) {
+                ARModContainer.log.error("Failed in instance deserialization. Class: {}.",
+                        tag.getString("class"));
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
 		}
 		case UPDATE:
 		{

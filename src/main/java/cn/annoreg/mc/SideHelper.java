@@ -8,6 +8,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class SideHelper {
 	//TODO load client on server?
@@ -15,10 +16,16 @@ public class SideHelper {
         @Override protected SideHelper initialValue() {
             Side s = FMLCommonHandler.instance().getEffectiveSide();
             if (s.isClient()) {
-                return new SideHelper(new ClientProxy());
+                return new SideHelper(getClientProxy());
             } else {
                 return new SideHelper(new ServerProxy());
             }
+        }
+        
+        // FIXME: TEMP WORKAROUND
+        @SideOnly(Side.CLIENT)
+        private ServerProxy getClientProxy() {
+        	return new ClientProxy();
         }
     };
     

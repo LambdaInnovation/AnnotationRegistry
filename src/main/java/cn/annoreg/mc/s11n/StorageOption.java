@@ -18,7 +18,9 @@ import java.lang.annotation.RetentionPolicy;
 public class StorageOption {
 
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Null {}
+    public @interface Null {
+        boolean nullable() default false;
+    }
 
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Data {}
@@ -59,5 +61,11 @@ public class StorageOption {
 		 * Will use the option contained in the data.
 		 */
 		AUTO,
+		
+		/**
+		 * Allow the instance to be null.
+		 * You can use this option directly, or use <code>@Instance(nullable=true)</code>
+		 */
+		NULLABLE_INSTANCE,
 	}
 }
