@@ -15,7 +15,7 @@ package cn.annoreg.mc;
 import java.lang.reflect.Method;
 
 import cn.annoreg.ARModContainer;
-import cn.annoreg.mc.proxy.ServerProxy;
+import cn.annoreg.mc.impl.proxy.ServerProxy;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.Entity;
@@ -37,9 +37,9 @@ public class ProxyHelper {
 	static {
 		try {
 			if (isClient()) {
-				proxy = (ServerProxy) Class.forName("cn.annoreg.mc.proxy.ClientProxy").newInstance();
+				proxy = (ServerProxy) Class.forName("cn.annoreg.mc.impl.proxy.ClientProxy").newInstance();
 			} else {
-				proxy = (ServerProxy) Class.forName("cn.annoreg.mc.proxy.ServerProxy").newInstance();
+				proxy = (ServerProxy) Class.forName("cn.annoreg.mc.impl.proxy.ServerProxy").newInstance();
 			}
 		} catch (Exception e) {
 			ARModContainer.log.fatal("Can not create proxy.");

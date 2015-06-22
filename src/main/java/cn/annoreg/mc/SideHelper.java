@@ -1,7 +1,7 @@
 package cn.annoreg.mc;
 
-import cn.annoreg.mc.proxy.ClientProxy;
-import cn.annoreg.mc.proxy.ServerProxy;
+import cn.annoreg.mc.impl.proxy.ClientProxy;
+import cn.annoreg.mc.impl.proxy.ServerProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
