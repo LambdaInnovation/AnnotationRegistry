@@ -22,6 +22,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import cn.annoreg.ARModContainer;
 import cn.annoreg.mc.SideHelper;
+import cn.annoreg.mc.s11n.NullInstanceException;
 import cn.annoreg.mc.s11n.SerializationManager;
 import cn.annoreg.mc.s11n.StorageOption;
 import cn.annoreg.mc.s11n.StorageOption.Target.RangeOption;
@@ -78,9 +79,14 @@ public class NetworkCallManager {
             //Get objects from message
             NBTTagList nbtList = message.params;
             Object[] params = new Object[nbtList.tagCount()];
-            for (int i = 0; i < params.length; ++i) {
-                //TODO removeTag is the only way to get a tag at the given index?
-                params[i] = SerializationManager.INSTANCE.deserialize(null, nbtList.removeTag(0), StorageOption.Option.AUTO);
+            try {
+                for (int i = 0; i < params.length; ++i) {
+                    //TODO removeTag is the only way to get a tag at the given index?
+                    params[i] = SerializationManager.INSTANCE.deserialize(null, nbtList.removeTag(0), StorageOption.Option.AUTO);
+                }
+            } catch (NullInstanceException e) {
+                //null check failed, cancel.
+                return null;
             }
             delegate.invoke(params);
             return null;

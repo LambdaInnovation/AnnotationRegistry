@@ -61,6 +61,10 @@ public class DelegateGenerator {
         //by returning a MethodVisitor under the ClassVisitor of the delegate class.
         //Besides, we should generate a call to NetworkCallManager into parent.
         
+        //Above is the original method. Now it has a little bit change. To allow private call in
+        //here, we need to generate the delegate method in this class instead of in a delegate class.
+        //We make the delegate method public so that the delegate class can call it.
+        
         //delegateName is a string used by both sides to identify a network-call delegate.
         final String delegateName = className + ":" + methodName + ":" + desc;
         final Type[] args = Type.getArgumentTypes(desc);
@@ -159,14 +163,28 @@ public class DelegateGenerator {
                     options[i] = StorageOption.Option.NULL; //set default value
                 }
             }
-            
+
             @Override
-            public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
+            public AnnotationVisitor visitParameterAnnotation(final int parameter, String desc, boolean visible) {
                 Type type = Type.getType(desc);
                 if (type.equals(Type.getType(StorageOption.Data.class))) {
                     options[parameter] = StorageOption.Option.DATA;
                 } else if (type.equals(Type.getType(StorageOption.Instance.class))) {
+                    //INSTANCE as defualt
                     options[parameter] = StorageOption.Option.INSTANCE;
+                    
+                    //Change to NULLABLE_INSTANCE if nullable set to true
+                    return new AnnotationVisitor(this.api, super.visitParameterAnnotation(parameter, desc, visible)) {
+                        @Override
+                        public void visit(String name, Object value) {
+                            if (name.equals("nullable")) {
+                                if ((Boolean) value == true) {
+                                    options[parameter] = StorageOption.Option.NULLABLE_INSTANCE;
+                                }
+                            }
+                            super.visit(name, value);
+                        }
+                    };
                 } else if (type.equals(Type.getType(StorageOption.Update.class))) {
                     options[parameter] = StorageOption.Option.UPDATE;
                 } else if (type.equals(Type.getType(StorageOption.Null.class))) {
@@ -340,13 +358,27 @@ public class DelegateGenerator {
             }
             
             @Override
-            public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
-                parameter = parameter + 1; //skip this
+            public AnnotationVisitor visitParameterAnnotation(int parameter_in_func, String desc, boolean visible) {
+                final int parameter = parameter_in_func + 1; //skip this
                 Type type = Type.getType(desc);
                 if (type.equals(Type.getType(StorageOption.Data.class))) {
                     options[parameter] = StorageOption.Option.DATA;
                 } else if (type.equals(Type.getType(StorageOption.Instance.class))) {
+                    //INSTANCE as defualt
                     options[parameter] = StorageOption.Option.INSTANCE;
+                    
+                    //Change to NULLABLE_INSTANCE if nullable set to true
+                    return new AnnotationVisitor(this.api, super.visitParameterAnnotation(parameter, desc, visible)) {
+                        @Override
+                        public void visit(String name, Object value) {
+                            if (name.equals("nullable")) {
+                                if ((Boolean) value == true) {
+                                    options[parameter] = StorageOption.Option.NULLABLE_INSTANCE;
+                                }
+                            }
+                            super.visit(name, value);
+                        }
+                    };
                 } else if (type.equals(Type.getType(StorageOption.Update.class))) {
                     options[parameter] = StorageOption.Option.UPDATE;
                 } else if (type.equals(Type.getType(StorageOption.Null.class))) {
