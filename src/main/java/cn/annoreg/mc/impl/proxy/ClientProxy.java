@@ -48,7 +48,7 @@ public class ClientProxy extends ServerProxy {
 	@Override
 	public World getWorld(int dimension) {
 		World theWorld = Minecraft.getMinecraft().theWorld;
-		if (theWorld.provider.dimensionId == dimension) {
+		if (theWorld != null && theWorld.provider.dimensionId == dimension) {
 			return theWorld;
 		} else {
 			return null;

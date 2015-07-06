@@ -80,7 +80,7 @@ public class SerializationManager {
 			            Collection coll = (Collection) obj;
 			            NBTTagList list = new NBTTagList();
 			            for (Object element : coll) {
-			                list.appendTag(serialize(obj, StorageOption.Option.DATA));
+			                list.appendTag(serialize(element, StorageOption.Option.DATA));
 			            }
 			            ret.setBoolean("__isCollection__", true);
 			            ret.setTag("collection", list);
