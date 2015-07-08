@@ -52,7 +52,7 @@ public class ServerProxy {
 	}
 	
 	public EntityPlayer getPlayerOnServer(String name) {
-	    return MinecraftServer.getServer().getConfigurationManager().func_152612_a(name);
+	    return MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(name);
 	}
 	
 	public Object[] getPlayerList() {
