@@ -36,12 +36,12 @@ public final class Future {
         wrapper.registerMessage(FutureSyncMessageHandler.class, FutureSyncMessage.class, 2, Side.CLIENT);
 	}
     
-    public static interface FutureCallback {
+    public static interface FutureCallback<T> {
         /**
          * Called when the future gets its value
          * @param val The returned value
          */
-        void onReady(Object val);
+        void onReady(T val);
     }
     
     private static final ThreadLocal<Map<Integer, Future>> futureMap = new ThreadLocal<Map<Integer, Future>>() {

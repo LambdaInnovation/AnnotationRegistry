@@ -27,6 +27,7 @@ import cn.annoreg.mc.s11n.SerializationManager;
 import cn.annoreg.mc.s11n.StorageOption;
 import cn.annoreg.mc.s11n.StorageOption.Target.RangeOption;
 import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -115,7 +116,7 @@ public class NetworkCallManager {
     }
     
     public static void registerClientDelegateClass(final String delegateName, NetworkCallDelegate delegate,
-            final StorageOption.Option[] options, final int targetIndex, final RangeOption range) {
+            final StorageOption.Option[] options, final int targetIndex, final RangeOption range, final double sendRange) {
         callerMap.put(delegateName, new Caller() {
             @Override
             public void invoke(Object[] args) {
@@ -135,9 +136,15 @@ public class NetworkCallManager {
                 }
                 if (targetIndex == -1) {
                     netHandler.sendToAll(new NetworkCallMessage(delegateName, params));
+                } else if(range == null) {
+                	TargetPoint point = TargetPointHelper.convert(args[targetIndex], sendRange);
+                	if(point != null) {
+                		netHandler.sendToAllAround(new NetworkCallMessage(delegateName, params), point);
+                	} else {
+                		ARModContainer.log.error("NULL TargetPoint par: Sending failed. " + delegateName);
+                	}
                 } else if (range == RangeOption.SINGLE) {
                     EntityPlayerMP playerTarget = (EntityPlayerMP) args[targetIndex];
-                    //FIXME: Workaround for NULL player instance
                     if(playerTarget != null) {
                     	netHandler.sendTo(new NetworkCallMessage(delegateName, params), playerTarget);
                     } else {
