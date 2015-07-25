@@ -86,7 +86,7 @@ public final class Future {
      * @param callback
      * @return
      */
-    public static Future create(FutureCallback callback) {
+    public static <T> Future create(FutureCallback<T> callback) {
         Future ret = create();
         ret.onSync(callback);
         return ret;

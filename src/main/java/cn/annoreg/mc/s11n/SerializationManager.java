@@ -104,7 +104,7 @@ public class SerializationManager {
                         Collection coll = (Collection) obj;
                         NBTTagList list = new NBTTagList();
                         for (Object element : coll) {
-                            list.appendTag(serialize(obj, StorageOption.Option.INSTANCE));
+                            list.appendTag(serialize(element, StorageOption.Option.INSTANCE));
                         }
                         ret.setBoolean("__isCollection__", true);
                         ret.setTag("collection", list);
@@ -159,7 +159,8 @@ public class SerializationManager {
                 Collection coll = (Collection) clazz.newInstance();
                 NBTTagList nbtcoll = (NBTTagList) tag.getTag("collection");
                 for (int i = 0; i < nbtcoll.tagCount(); ++i) {
-                    coll.add(deserialize(null, nbtcoll.getCompoundTagAt(i), option));
+                	Object o = deserialize(null, nbtcoll.getCompoundTagAt(i), option);
+                	if(o != null) coll.add(o);
                 }
                 return coll;
             } catch (Exception e) {
