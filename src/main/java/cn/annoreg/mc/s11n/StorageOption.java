@@ -18,15 +18,15 @@ import java.lang.annotation.RetentionPolicy;
 public class StorageOption {
 
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Null {
-        boolean nullable() default false;
-    }
+    public @interface Null {}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Data {}
 
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Instance {}
+	public @interface Instance {
+		boolean nullable() default false;
+	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Update {}

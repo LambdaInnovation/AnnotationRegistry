@@ -98,6 +98,7 @@ public class SerializationManager {
 				return null;
 			}
 		case INSTANCE:
+		case NULLABLE_INSTANCE:
 			try {
                 if (i == null) {
                     if (obj instanceof Collection) {
