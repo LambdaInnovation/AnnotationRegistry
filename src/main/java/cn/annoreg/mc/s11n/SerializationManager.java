@@ -36,6 +36,7 @@ import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.nbt.NBTTagShort;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -622,6 +623,25 @@ public class SerializationManager {
 				}
 			};
 			setDataSerializerFor(ItemStack.class, ser);
+		}
+		{
+			DataSerializer ser = new DataSerializer<Vec3>() {
+				@Override
+				public Vec3 readData(NBTBase nbt, Vec3 obj) throws Exception {
+					NBTTagCompound tag = (NBTTagCompound) nbt;
+					return Vec3.createVectorHelper(tag.getFloat("x"), tag.getFloat("y"), tag.getFloat("z"));
+				}
+
+				@Override
+				public NBTBase writeData(Vec3 obj) throws Exception {
+					NBTTagCompound nbt = new NBTTagCompound();
+					nbt.setFloat("x", (float) obj.xCoord);
+					nbt.setFloat("y", (float) obj.yCoord);
+					nbt.setFloat("z", (float) obj.zCoord);
+					return nbt;
+				}
+			};
+			setDataSerializerFor(Vec3.class, ser);
 		}
 		//network part
 		{
