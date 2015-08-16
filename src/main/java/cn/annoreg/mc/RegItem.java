@@ -34,7 +34,7 @@ public @interface RegItem {
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
-	public @interface UTName {
+	public @interface UName {
 		String value();
 	}
 

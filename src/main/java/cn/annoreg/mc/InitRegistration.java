@@ -16,8 +16,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import cn.annoreg.base.RegistrationClassOrField;
 import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;

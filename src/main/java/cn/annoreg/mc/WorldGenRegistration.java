@@ -12,8 +12,8 @@
  */
 package cn.annoreg.mc;
 
-import cpw.mods.fml.common.IWorldGenerator;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.IWorldGenerator;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import cn.annoreg.base.RegistrationFieldSimple;
 import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegistryTypeDecl;

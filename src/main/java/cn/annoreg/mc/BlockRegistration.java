@@ -17,8 +17,8 @@ import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 import net.minecraft.block.Block;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
-import cpw.mods.fml.common.registry.GameRegistry;
 
 @RegistryTypeDecl
 public class BlockRegistration extends RegistrationFieldSimple<RegBlock, Block> {
@@ -34,11 +34,10 @@ public class BlockRegistration extends RegistrationFieldSimple<RegBlock, Block> 
 			}
 		});
 		
-		this.addWork(RegBlock.BTName.class, new PostWork<RegBlock.BTName, Block>() {
+		this.addWork(RegBlock.UName.class, new PostWork<RegBlock.UName, Block>() {
 			@Override
-			public void invoke(RegBlock.BTName anno, Block obj) throws Exception {
-				obj.setBlockName(getCurrentMod().getPrefix() + anno.value());
-				obj.setBlockTextureName(getCurrentMod().getRes(anno.value()));
+			public void invoke(RegBlock.UName anno, Block obj) throws Exception {
+				obj.setUnlocalizedName(getCurrentMod().getPrefix() + anno.value());
 			}
 		});
 		

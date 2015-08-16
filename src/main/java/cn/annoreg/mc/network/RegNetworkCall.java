@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 
 import cn.annoreg.mc.s11n.StorageOption;
 
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.Side;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

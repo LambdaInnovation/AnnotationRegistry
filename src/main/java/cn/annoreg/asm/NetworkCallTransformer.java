@@ -18,7 +18,6 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import cpw.mods.fml.relauncher.Side;
 import cn.annoreg.asm.NetworkCallVisitor.ClassMethod;
 import cn.annoreg.mc.network.NetworkCallManager;
 

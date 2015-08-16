@@ -15,8 +15,8 @@ package cn.annoreg.mc;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.Item;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import cn.annoreg.base.RegistrationFieldSimple;
 import cn.annoreg.core.LoadStage;
@@ -37,11 +37,10 @@ public class ItemRegistration extends RegistrationFieldSimple<RegItem, Item> {
 			}
 		});
 		
-		this.addWork(RegItem.UTName.class, new PostWork<RegItem.UTName, Item>() {
+		this.addWork(RegItem.UName.class, new PostWork<RegItem.UName, Item>() {
 			@Override
-			public void invoke(RegItem.UTName anno, Item obj) throws Exception {
+			public void invoke(RegItem.UName anno, Item obj) throws Exception {
 				obj.setUnlocalizedName(getCurrentMod().getPrefix() + anno.value());
-				obj.setTextureName(getCurrentMod().getRes(anno.value()));
 			}
 		});
 		

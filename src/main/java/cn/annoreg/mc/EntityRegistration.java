@@ -22,9 +22,8 @@ import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 import cn.annoreg.mc.RegEntity.HasRender;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.registry.EntityRegistry;
 import net.minecraft.entity.Entity;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 @RegistryTypeDecl
 public class EntityRegistration extends RegistrationClassSimple<RegEntity, Entity> {

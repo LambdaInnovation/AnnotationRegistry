@@ -20,9 +20,8 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import cpw.mods.fml.common.MetadataCollection;
-import cpw.mods.fml.relauncher.IFMLCallHook;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraftforge.fml.common.MetadataCollection;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 public class AnnoRegCorePlugin implements IFMLLoadingPlugin {
     public static MetadataCollection mc = MetadataCollection.from(null,"");

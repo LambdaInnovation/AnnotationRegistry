@@ -17,7 +17,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cpw.mods.fml.common.IWorldGenerator;
 import net.minecraft.util.WeightedRandomChestContent;
 
 /**

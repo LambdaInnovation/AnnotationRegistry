@@ -22,8 +22,8 @@ import java.util.Map;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.IGuiHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import cn.annoreg.ARModContainer;
 import cn.annoreg.base.RegistrationFieldSimple;
 import cn.annoreg.core.AnnotationData;

@@ -5,8 +5,8 @@ import cn.annoreg.mc.SideHelper;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 public final class NetworkTerminal {
     
@@ -18,7 +18,7 @@ public final class NetworkTerminal {
     
     public static NetworkTerminal create() {
         if (SideHelper.isClient()) {
-            return new NetworkTerminal(SideHelper.getThePlayer().getCommandSenderName());
+            return new NetworkTerminal(SideHelper.getThePlayer().getName());
         }
         return new NetworkTerminal(null);
     }

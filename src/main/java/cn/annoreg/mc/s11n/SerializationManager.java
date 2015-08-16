@@ -36,6 +36,7 @@ import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.nbt.NBTTagShort;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
@@ -343,7 +344,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<Byte>() {
 				@Override
 				public Byte readData(NBTBase nbt, Byte obj) throws Exception {
-					return ((NBTTagByte) nbt).func_150290_f();
+					return ((NBTTagByte) nbt).getByte();
 				}
 
 				@Override
@@ -358,7 +359,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<Byte[]>() {
 				@Override
 				public Byte[] readData(NBTBase nbt, Byte[] obj) throws Exception {
-					return ArrayUtils.toObject(((NBTTagByteArray) nbt).func_150292_c());
+					return ArrayUtils.toObject(((NBTTagByteArray) nbt).getByteArray());
 				}
 
 				@Override
@@ -372,7 +373,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<byte[]>() {
 				@Override
 				public byte[] readData(NBTBase nbt, byte[] obj) throws Exception {
-					return ((NBTTagByteArray) nbt).func_150292_c();
+					return ((NBTTagByteArray) nbt).getByteArray();
 				}
 
 				@Override
@@ -386,7 +387,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<Double>() {
 				@Override
 				public Double readData(NBTBase nbt, Double obj) throws Exception {
-					return ((NBTTagDouble) nbt).func_150286_g();
+					return ((NBTTagDouble) nbt).getDouble();
 				}
 
 				@Override
@@ -401,7 +402,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<Float>() {
 				@Override
 				public Float readData(NBTBase nbt, Float obj) throws Exception {
-					return ((NBTTagFloat) nbt).func_150288_h();
+					return ((NBTTagFloat) nbt).getFloat();
 				}
 
 				@Override
@@ -416,7 +417,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<Integer>() {
 				@Override
 				public Integer readData(NBTBase nbt, Integer obj) throws Exception {
-					return ((NBTTagInt) nbt).func_150287_d();
+					return ((NBTTagInt) nbt).getInt();
 				}
 
 				@Override
@@ -431,7 +432,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<Integer[]>() {
 				@Override
 				public Integer[] readData(NBTBase nbt, Integer[] obj) throws Exception {
-					return ArrayUtils.toObject(((NBTTagIntArray) nbt).func_150302_c());
+					return ArrayUtils.toObject(((NBTTagIntArray) nbt).getIntArray());
 				}
 
 				@Override
@@ -445,7 +446,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<int[]>() {
 				@Override
 				public int[] readData(NBTBase nbt, int[] obj) throws Exception {
-					return ((NBTTagIntArray) nbt).func_150302_c();
+					return ((NBTTagIntArray) nbt).getIntArray();
 				}
 
 				@Override
@@ -459,7 +460,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<Long>() {
 				@Override
 				public Long readData(NBTBase nbt, Long obj) throws Exception {
-					return ((NBTTagLong) nbt).func_150291_c();
+					return ((NBTTagLong) nbt).getLong();
 				}
 
 				@Override
@@ -474,7 +475,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<Short>() {
 				@Override
 				public Short readData(NBTBase nbt, Short obj) throws Exception {
-					return ((NBTTagShort) nbt).func_150289_e();
+					return ((NBTTagShort) nbt).getShort();
 				}
 
 				@Override
@@ -489,7 +490,7 @@ public class SerializationManager {
 			DataSerializer ser = new DataSerializer<String>() {
 				@Override
 				public String readData(NBTBase nbt, String obj) throws Exception {
-					return ((NBTTagString) nbt).func_150285_a_();
+					return ((NBTTagString) nbt).getString();
 				}
 
 				@Override
@@ -537,7 +538,7 @@ public class SerializationManager {
 			InstanceSerializer ser = new InstanceSerializer<Entity>() {
 				@Override
 				public Entity readInstance(NBTBase nbt) throws Exception {
-					int[] ids = ((NBTTagIntArray) nbt).func_150302_c();
+					int[] ids = ((NBTTagIntArray) nbt).getIntArray();
 					World world = SideHelper.getWorld(ids[0]);
 					if (world != null) {
 						return world.getEntityByID(ids[1]);
@@ -556,18 +557,18 @@ public class SerializationManager {
 			InstanceSerializer ser = new InstanceSerializer<TileEntity>() {
 				@Override
 				public TileEntity readInstance(NBTBase nbt) throws Exception {
-					int[] ids = ((NBTTagIntArray) nbt).func_150302_c();
+					int[] ids = ((NBTTagIntArray) nbt).getIntArray();
 					World world = SideHelper.getWorld(ids[0]);
 					if (world != null) {
-						return world.getTileEntity(ids[1], ids[2], ids[3]);
+						return world.getTileEntity(new BlockPos(ids[1], ids[2], ids[3]));
 					}
 					return null;
 				}
 
 				@Override
 				public NBTBase writeInstance(TileEntity obj) throws Exception {
-					return new NBTTagIntArray(new int[] { obj.getWorldObj().provider.dimensionId,
-							obj.xCoord, obj.yCoord, obj.zCoord });
+					return new NBTTagIntArray(new int[] { obj.getWorld().provider.getDimensionId(),
+							obj.getPos().getX(), obj.getPos().getY(), obj.getPos().getZ() });
 				}
 			};
 			setInstanceSerializerFor(TileEntity.class, ser);
@@ -577,7 +578,7 @@ public class SerializationManager {
 			InstanceSerializer ser = new InstanceSerializer<Container>() {
 				@Override
 				public Container readInstance(NBTBase nbt) throws Exception {
-					int[] ids = ((NBTTagIntArray) nbt).func_150302_c();
+					int[] ids = ((NBTTagIntArray) nbt).getIntArray();
 					World world = SideHelper.getWorld(ids[0]);
 					if (world != null) {
 						Entity entity = world.getEntityByID(ids[1]);
@@ -593,7 +594,7 @@ public class SerializationManager {
 					EntityPlayer player = SideHelper.getThePlayer();
 					if (player != null) {
 						//This is on client. The server needs player to get the Container.
-						return new NBTTagIntArray(new int[] { player.worldObj.provider.dimensionId,
+						return new NBTTagIntArray(new int[] { player.worldObj.provider.getDimensionId(),
 								player.getEntityId(), obj.windowId});
 					} else {
 						//This is on server. The client doesn't need player (just use thePlayer), use MAX_VALUE here.
@@ -629,7 +630,7 @@ public class SerializationManager {
 				@Override
 				public Vec3 readData(NBTBase nbt, Vec3 obj) throws Exception {
 					NBTTagCompound tag = (NBTTagCompound) nbt;
-					return Vec3.createVectorHelper(tag.getFloat("x"), tag.getFloat("y"), tag.getFloat("z"));
+					return new Vec3(tag.getFloat("x"), tag.getFloat("y"), tag.getFloat("z"));
 				}
 
 				@Override

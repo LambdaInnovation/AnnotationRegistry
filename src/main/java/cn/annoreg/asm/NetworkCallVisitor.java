@@ -15,6 +15,8 @@ package cn.annoreg.asm;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraftforge.fml.relauncher.Side;
+
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -22,7 +24,6 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
-import cpw.mods.fml.relauncher.Side;
 import cn.annoreg.core.Registrant;
 import cn.annoreg.mc.network.NetworkCallManager;
 import cn.annoreg.mc.network.RegNetworkCall;

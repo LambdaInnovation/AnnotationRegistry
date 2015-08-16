@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraftforge.fml.common.discovery.ASMDataTable.ASMData;
 import cn.annoreg.ARModContainer;
 import cn.annoreg.base.RegistrationEmpty;
 import cn.annoreg.mc.BlockRegistration;
-import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 
 public class RegistrationManager {
 	

@@ -13,6 +13,7 @@
 package cn.annoreg.asm;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
@@ -25,7 +26,6 @@ import org.objectweb.asm.Type;
 import cn.annoreg.mc.network.NetworkCallDelegate;
 import cn.annoreg.mc.network.NetworkCallManager;
 import cn.annoreg.mc.s11n.StorageOption;
-import cpw.mods.fml.relauncher.Side;
 
 public class DelegateGenerator {
     

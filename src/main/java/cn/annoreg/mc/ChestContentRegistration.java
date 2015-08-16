@@ -18,7 +18,6 @@ import cn.annoreg.base.RegistrationFieldSimple;
 import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegistryTypeDecl;
 import cn.annoreg.core.RegistrationWithPostWork.PostWork;
-import cpw.mods.fml.common.registry.GameRegistry;
 
 /**
  * @author KSkun

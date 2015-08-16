@@ -12,19 +12,19 @@
  */
 package cn.annoreg.mc;
 
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import cn.annoreg.base.RegistrationInstance;
 import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegistryTypeDecl;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import cpw.mods.fml.client.registry.RenderingRegistry;
 
 /**
  * @author WeAthFolD
+ * TODO: Fix function
  */
 @RegistryTypeDecl
-public class BlockRendererRegistration extends
-		RegistrationInstance<RegBlockRenderer, ISimpleBlockRenderingHandler> {
-
+public class BlockRendererRegistration //extends
+/*		RegistrationInstance<RegBlockRenderer, ISimpleBlockRenderingHandler>*/ {
+/*
 	public BlockRendererRegistration() {
 		super(RegBlockRenderer.class, "BlockRenderer");
 		this.setLoadStage(LoadStage.INIT);
@@ -35,5 +35,5 @@ public class BlockRendererRegistration extends
 			RegBlockRenderer anno) throws Exception {
 		RenderingRegistry.registerBlockHandler(obj);
 	}
-
+*/
 }

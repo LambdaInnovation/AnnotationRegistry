@@ -17,9 +17,9 @@ import cn.annoreg.base.RegistrationClassSimple;
 import cn.annoreg.core.LoadStage;
 import cn.annoreg.core.RegistryTypeDecl;
 import cn.annoreg.mc.RegTileEntity.HasRender;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 
 @RegistryTypeDecl
 public class TileEntityRegistration extends RegistrationClassSimple<RegTileEntity, TileEntity> {

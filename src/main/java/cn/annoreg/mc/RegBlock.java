@@ -39,11 +39,11 @@ public @interface RegBlock {
 	
 	/**
 	 * Register the block's unlocalized name and icon name at once.
-	 * e.g. @RegBlock.BTName("fff") in mod "academy" will give unlocalized name "fff" and icon name "academy:fff".
+	 * e.g. @RegBlock.UName("fff") in mod "academy" will give unlocalized name "fff" and icon name "academy:fff".
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
-	public @interface BTName {
+	public @interface UName {
 		String value();
 	}
 	
