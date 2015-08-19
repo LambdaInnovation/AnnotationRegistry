@@ -46,6 +46,7 @@ buildscript {
 }
 
 apply plugin: 'litebuilder'
+apply plugin: 'me.tatarka.retrolambda'
 
 litebuilder {
     //The bucket name of OSS to upload.
@@ -101,14 +102,4 @@ litebuilder {
             }
         }
     }
-}
-
-apply plugin: 'me.tatarka.retrolambda'
-
-retrolambda {
-  jdk System.getenv("JAVA8_HOME")
-  oldJdk System.getenv("JAVA7_HOME")
-  javaVersion JavaVersion.VERSION_1_7
-  defaultMethods false
-  incremental true
 }
