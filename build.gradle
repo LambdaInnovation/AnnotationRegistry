@@ -48,7 +48,7 @@ litebuilder {
     name = "AnnotationRegistry"
     group = "cn.annoreg"
 
-    forgeVersion = "1.7.2-10.12.2.1121"
+    forgeVersion = "1.7.10-10.13.4.1448-1.7.10"
 
     jarClasses {
     }
