@@ -29,6 +29,14 @@ buildscript {
             name = "lidev"
             url = "http://maven.li-dev.cn/"
         }
+		maven {
+            name = "lidev"
+            url = "http://maven.li-dev.cn/"
+        }
+		maven {
+            name = "lidev-dev"
+            url = "http://maven.li-dev.cn/dev/"
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
@@ -56,13 +64,6 @@ litebuilder {
 
     jarClasses {
     }
-	
-	jar {
-		manifest {
-			attributes 'FMLCorePluginContainsFMLMod' : 'true'
-			attributes 'FMLCorePlugin' : 'cn.annoreg.AnnoRegCorePlugin'
-		}
-	}
 
     coremod {
         plugin = 'cn.annoreg.AnnoRegCorePlugin'
