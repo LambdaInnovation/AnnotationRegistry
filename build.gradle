@@ -33,6 +33,7 @@ buildscript {
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
 		classpath 'cn.lidev:LIteBuilder:1.0.0'
+		classpath 'me.tatarka:gradle-retrolambda:3.2.2'
     }
 }
 
@@ -49,9 +50,19 @@ litebuilder {
     group = "cn.annoreg"
 
     forgeVersion = "1.7.10-10.13.4.1448-1.7.10"
+	
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
 
     jarClasses {
     }
+	
+	jar {
+		manifest {
+			attributes 'FMLCorePluginContainsFMLMod' : 'true'
+			attributes 'FMLCorePlugin' : 'cn.annoreg.AnnoRegCorePlugin'
+		}
+	}
 
     coremod {
         plugin = 'cn.annoreg.AnnoRegCorePlugin'
@@ -89,4 +100,14 @@ litebuilder {
             }
         }
     }
+}
+
+apply plugin: 'me.tatarka.retrolambda'
+
+retrolambda {
+  jdk System.getenv("JAVA8_HOME")
+  oldJdk System.getenv("JAVA7_HOME")
+  javaVersion JavaVersion.VERSION_1_7
+  defaultMethods false
+  incremental true
 }
