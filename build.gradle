@@ -58,7 +58,7 @@ litebuilder {
     name = "AnnotationRegistry"
     group = "cn.annoreg"
 
-    forgeVersion = "1.7.10-10.13.4.1448-1.7.10"
+    forgeVersion = "1.8-11.14.3.1450"
 	
 	sourceCompatibility = 1.8
 	targetCompatibility = 1.8
