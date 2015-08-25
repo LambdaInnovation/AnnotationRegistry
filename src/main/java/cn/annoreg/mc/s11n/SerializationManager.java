@@ -604,6 +604,22 @@ public class SerializationManager {
 			setInstanceSerializerFor(Container.class, ser);
 		}
 		{
+			InstanceSerializer ser = new InstanceSerializer<World>() {
+
+				@Override
+				public World readInstance(NBTBase nbt) throws Exception {
+					return SideHelper.getWorld(((NBTTagInt) nbt).func_150287_d());
+				}
+
+				@Override
+				public NBTBase writeInstance(World obj) throws Exception {
+					return new NBTTagInt(obj.provider.dimensionId);
+				}
+				
+			};
+			setInstanceSerializerFor(World.class, ser);
+		}
+		{
 			DataSerializer ser = new DataSerializer<ItemStack>() {
 				@Override
 				public ItemStack readData(NBTBase nbt, ItemStack obj) throws Exception {
