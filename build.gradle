@@ -29,14 +29,24 @@ buildscript {
             name = "lidev"
             url = "http://maven.li-dev.cn/"
         }
+		maven {
+            name = "lidev"
+            url = "http://maven.li-dev.cn/"
+        }
+		maven {
+            name = "lidev-dev"
+            url = "http://maven.li-dev.cn/dev/"
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
 		classpath 'cn.lidev:LIteBuilder:1.0.0'
+//		classpath 'me.tatarka:gradle-retrolambda:3.2.2'
     }
 }
 
 apply plugin: 'litebuilder'
+//apply plugin: 'me.tatarka.retrolambda'
 
 litebuilder {
     //The bucket name of OSS to upload.
@@ -48,7 +58,10 @@ litebuilder {
     name = "AnnotationRegistry"
     group = "cn.annoreg"
 
-    forgeVersion = "1.7.2-10.12.2.1121"
+    forgeVersion = "1.7.10-10.13.4.1448-1.7.10"
+	
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
 
     jarClasses {
     }
