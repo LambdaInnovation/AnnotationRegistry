@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.apache.commons.io.IOUtils;
+
 import net.minecraftforge.fml.common.MetadataCollection;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
@@ -59,16 +61,10 @@ public class AnnoRegCorePlugin implements IFMLLoadingPlugin {
                 jar = new JarFile(modFile);
                 ZipEntry modInfo = jar.getEntry("mcmod.info");
                 mc = MetadataCollection.from(jar.getInputStream(modInfo), modFile.getName());
-                jar.close();
             } catch (Throwable e) {
                 e.printStackTrace();
             } finally {
-                if (jar != null) {
-                    try {
-                        jar.close();
-                    } catch (IOException e) {
-                    }
-                }
+                IOUtils.closeQuietly(jar);
             }
 	    }
 	}
