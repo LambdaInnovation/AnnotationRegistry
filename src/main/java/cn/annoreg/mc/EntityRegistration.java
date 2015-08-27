@@ -12,17 +12,11 @@
  */
 package cn.annoreg.mc;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-
+import cn.annoreg.ARModContainer;
 import cn.annoreg.base.RegistrationClassSimple;
 import cn.annoreg.core.LoadStage;
-import cn.annoreg.core.RegModInformation;
 import cn.annoreg.core.RegistryTypeDecl;
 import cn.annoreg.mc.RegEntity.HasRender;
-import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import net.minecraft.entity.Entity;
 
@@ -47,6 +41,7 @@ public class EntityRegistration extends RegistrationClassSimple<RegEntity, Entit
 	@Override
 	protected void register(Class<? extends Entity> theClass, RegEntity anno) throws Exception {
 		if (!anno.clientOnly()) {
+			ARModContainer.log.info("REG " + theClass);
 			EntityRegistry.registerModEntity(theClass, getSuggestedName(), 
 					helper.getNextIDForMod(), getCurrentMod().getModInstance(), 
 					anno.trackRange(), anno.freq(), anno.updateVel());
