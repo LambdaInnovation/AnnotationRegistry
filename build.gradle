@@ -16,6 +16,7 @@ buildscript {
 }
 
 apply plugin: 'forge'
+apply plugin: 'maven'
 
 version = "0.0." + System.env.BUILD_NUMBER
 group= "cn.annoreg"
@@ -72,4 +73,3 @@ task deobfJar(type: Jar, dependsOn: 'jar') {
 artifacts {
 	archives deobfJar
 }
-
