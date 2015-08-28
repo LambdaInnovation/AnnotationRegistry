@@ -1,19 +1,3 @@
-//This build script can upload built jars to a maven repo.
-//
-//Usage:
-//  Use task 'uploadModToOss'. It will build, generate jars and publish them.
-//  gradle params:
-//    -PnewMavenRepo=1
-//      Create a new maven repo.
-//    -PpublishVersion=<string>
-//      Use the given string as the project version.
-//    -PossKeyId=<string>
-//      The AccessKey ID in authentication to OSS Client.
-//    -PossKeySecret=<string>
-//      The AccessKey Secret in authentication to OSS Client.
-//    -PossEndpoint=<string>
-//      The Endpoint of Aliyun OSS to upload.
-
 buildscript {
     repositories {
         mavenCentral()
@@ -25,81 +9,67 @@ buildscript {
             name = "sonatype"
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
-        maven {
-            name = "lidev"
-            url = "http://maven.li-dev.cn/"
-        }
-		maven {
-            name = "lidev"
-            url = "http://maven.li-dev.cn/"
-        }
-		maven {
-            name = "lidev-dev"
-            url = "http://maven.li-dev.cn/dev/"
-        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-		classpath 'cn.lidev:LIteBuilder:1.0.4'
-//		classpath 'me.tatarka:gradle-retrolambda:3.2.2'
     }
 }
 
-apply plugin: 'litebuilder'
-//apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'forge'
 
-litebuilder {
-    //The bucket name of OSS to upload.
-    ossBucket = "libuild"
-    //The folder name of OSS to upload.
-    //You can also put / into the string to upload to a child folder.
-    uploadDir = "dev"
-    
-    name = "AnnotationRegistry"
-    group = "cn.annoreg"
+version = "0.0." + System.env.BUILD_NUMBER
+group= "cn.annoreg"
+archivesBaseName = "AnnotationRegistry"
 
-    forgeVersion = "1.7.10-10.13.4.1448-1.7.10"
-	
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-    jarClasses {
+minecraft {
+    version = "1.7.10-10.13.4.1448-1.7.10"
+    runDir = "eclipse"
+}
+
+dependencies {
+}
+
+processResources
+{
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version':project.version, 'mcversion':project.minecraft.version
     }
-
-    coremod {
-        plugin = 'cn.annoreg.AnnoRegCorePlugin'
-    }
-
-    pom {
-        groupId = project.group
-        version = project.version
-        artifactId = project.archivesBaseName
-        project {
-            name project.archivesBaseName
-            packaging 'jar'
-            description 'A core mod that allows annotation based registry in Minecraft mod'
-            url 'https://github.com/LambdaInnovation/AnnotationRegistry'
-
-            issueManagement {
-                system 'github'
-                url 'https://github.com/LambdaInnovation/AnnotationRegistry/issues'
-            }
-
-            licenses {
-                license {
-                    name 'GNU General Public License.'
-                    url 'http://www.gnu.org/licenses/gpl.html'
-                    distribution 'repo'
-                }
-            }
-
-            developers {
-                developer {
-                    id 'LambdaInnovation'
-                    name 'LambdaInnovation'
-                    roles { role 'developer' }
-                }
-            }
-        }
+        
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
     }
 }
+
+//Custom options
+
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+
+jar {
+	manifest {
+		attributes 'FMLCorePluginContainsFMLMod' : 'true'
+		attributes 'FMLCorePlugin' : 'cn.annoreg.AnnoRegCorePlugin'
+	}
+}
+
+task deobfJar(type: Jar, dependsOn: 'jar') {
+	manifest {
+		attributes 'FMLCorePluginContainsFMLMod' : 'true'
+		attributes 'FMLCorePlugin' : 'cn.annoreg.AnnoRegCorePlugin'
+	}
+	from 'build/classes/main'
+	from 'build/resources/main'
+	classifier 'dev'
+}
+artifacts {
+	archives deobfJar
+}
+
