@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         mavenCentral()
+        mavenLocal()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -16,9 +17,8 @@ buildscript {
 }
 
 apply plugin: 'forge'
-apply plugin: 'maven'
 
-version = "0.0." + System.env.BUILD_NUMBER
+version = "SNAPSHOT-1.0"
 group= "cn.annoreg"
 archivesBaseName = "AnnotationRegistry"
 
