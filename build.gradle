@@ -68,13 +68,12 @@ jar {
 }
 
 task deobfJar(type: Jar, dependsOn: 'jar') {
+	classifier 'dev'
+	from sourceSets.main.output
 	manifest {
 		attributes 'FMLCorePluginContainsFMLMod' : 'true'
 		attributes 'FMLCorePlugin' : 'cn.annoreg.AnnoRegCorePlugin'
 	}
-	from 'build/classes/main'
-	from 'build/resources/main'
-	classifier 'dev'
 }
 
 artifacts {
