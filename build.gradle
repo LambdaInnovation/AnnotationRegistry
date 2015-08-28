@@ -1,33 +1,44 @@
 buildscript {
-    repositories {
-        mavenCentral()
-        mavenLocal()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-    }
+	repositories {
+		mavenCentral()
+		maven {
+			name = "forge"
+			url = "http://files.minecraftforge.net/maven"
+		}
+		maven {
+			name = "sonatype"
+			url = "https://oss.sonatype.org/content/repositories/snapshots/"
+		}
+	}
+	dependencies {
+		classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+	}
+}
+
+ext.configFile = file "build.properties"
+
+configFile.withReader {
+	def prop = new Properties()
+	prop.load(it)
+	project.ext.config = new ConfigSlurper().parse prop
 }
 
 apply plugin: 'forge'
 
-version = "SNAPSHOT-1.0"
-group= "cn.annoreg"
-archivesBaseName = "AnnotationRegistry"
+version				= config.mod_ver
+group				= config.mod_group
+archivesBaseName	= config.mod_name
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.7.10-10.13.4.1448-1.7.10"
-    runDir = "eclipse"
+	version = "${config.mc_ver}-${config.forge_ver}"
+	runDir = "eclipse"
+}
+
+repositories {
+	mavenLocal()
 }
 
 dependencies {
@@ -35,20 +46,15 @@ dependencies {
 
 processResources
 {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+	from(sourceSets.main.resources.srcDirs) {
+		include 'mcmod.info'
+		expand 'version':project.version, 'mcversion':project.minecraft.version
+	}
 
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+	from(sourceSets.main.resources.srcDirs) {
+		exclude 'mcmod.info'
+	}
 }
-
-//Custom options
 
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
@@ -70,6 +76,8 @@ task deobfJar(type: Jar, dependsOn: 'jar') {
 	from 'build/resources/main'
 	classifier 'dev'
 }
+
 artifacts {
 	archives deobfJar
 }
+
