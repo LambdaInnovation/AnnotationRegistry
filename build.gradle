@@ -23,6 +23,10 @@ configFile.withReader {
 	project.ext.config = new ConfigSlurper().parse prop
 }
 
+configurations {
+	deployerJars
+}
+
 apply plugin: 'forge'
 
 version				= config.mod_ver
@@ -38,10 +42,12 @@ minecraft {
 }
 
 repositories {
+	mavenCentral()
 	mavenLocal()
 }
 
 dependencies {
+	deployerJars "org.apache.maven.wagon:wagon-ftp:2.2"
 }
 
 processResources
@@ -73,6 +79,18 @@ task deobfJar(type: Jar, dependsOn: 'jar') {
 	manifest {
 		attributes 'FMLCorePluginContainsFMLMod' : 'true'
 		attributes 'FMLCorePlugin' : 'cn.annoreg.AnnoRegCorePlugin'
+	}
+}
+
+task uploadJars(type: Upload, dependsOn: 'install') {
+	configuration = configurations.archives
+	repositories {
+		mavenDeployer {
+			configuration = configurations.deployerJars
+			repository(url: config.upload_url) {
+				authentication(userName: config.upload_user, password: config.upload_pass)
+			}
+		}
 	}
 }
 
