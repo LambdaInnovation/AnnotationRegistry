@@ -41,7 +41,6 @@ public class EntityRegistration extends RegistrationClassSimple<RegEntity, Entit
 	@Override
 	protected void register(Class<? extends Entity> theClass, RegEntity anno) throws Exception {
 		if (!anno.clientOnly()) {
-			ARModContainer.log.info("REG " + theClass);
 			EntityRegistry.registerModEntity(theClass, getSuggestedName(), 
 					helper.getNextIDForMod(), getCurrentMod().getModInstance(), 
 					anno.trackRange(), anno.freq(), anno.updateVel());
