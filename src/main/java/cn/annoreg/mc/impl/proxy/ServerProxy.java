@@ -23,6 +23,7 @@ import net.minecraftforge.common.DimensionManager;
 import cn.annoreg.ARModContainer;
 
 public class ServerProxy {
+	
 	public void regEntityRender(Class<? extends Entity> clazz, Object obj) {
 		ARModContainer.log.fatal("Try to load renderer on server.");
 	}
@@ -58,4 +59,5 @@ public class ServerProxy {
 	public Object[] getPlayerList() {
 	    return MinecraftServer.getServer().getConfigurationManager().playerEntityList.toArray();
 	}
+	
 }

@@ -63,7 +63,8 @@ public abstract class GuiHandlerBase {
 	 */
 	
 	/**
-	 * Open a gui container. Should be called on both sides.
+	 * Open a gui container. Should be called on SERVER ONLY.
+	 * Side check is enforced.
 	 * @param player
 	 * @param world
 	 * @param x
@@ -71,7 +72,8 @@ public abstract class GuiHandlerBase {
 	 * @param z
 	 */
 	public final void openGuiContainer(EntityPlayer player, World world, int x, int y, int z) {
-		player.openGui(mod, guiId, world, x, y, z);
+		if(!world.isRemote)
+			player.openGui(mod, guiId, world, x, y, z);
 	}
 	
 	/**

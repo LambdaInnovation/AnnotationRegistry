@@ -36,6 +36,7 @@ import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.nbt.NBTTagShort;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -98,13 +99,14 @@ public class SerializationManager {
 				return null;
 			}
 		case INSTANCE:
+		case NULLABLE_INSTANCE:
 			try {
                 if (i == null) {
                     if (obj instanceof Collection) {
                         Collection coll = (Collection) obj;
                         NBTTagList list = new NBTTagList();
                         for (Object element : coll) {
-                            list.appendTag(serialize(obj, StorageOption.Option.INSTANCE));
+                            list.appendTag(serialize(element, StorageOption.Option.INSTANCE));
                         }
                         ret.setBoolean("__isCollection__", true);
                         ret.setTag("collection", list);
@@ -159,7 +161,8 @@ public class SerializationManager {
                 Collection coll = (Collection) clazz.newInstance();
                 NBTTagList nbtcoll = (NBTTagList) tag.getTag("collection");
                 for (int i = 0; i < nbtcoll.tagCount(); ++i) {
-                    coll.add(deserialize(null, nbtcoll.getCompoundTagAt(i), option));
+                	Object o = deserialize(null, nbtcoll.getCompoundTagAt(i), option);
+                	if(o != null) coll.add(o);
                 }
                 return coll;
             } catch (Exception e) {
@@ -601,6 +604,22 @@ public class SerializationManager {
 			setInstanceSerializerFor(Container.class, ser);
 		}
 		{
+			InstanceSerializer ser = new InstanceSerializer<World>() {
+
+				@Override
+				public World readInstance(NBTBase nbt) throws Exception {
+					return SideHelper.getWorld(((NBTTagInt) nbt).func_150287_d());
+				}
+
+				@Override
+				public NBTBase writeInstance(World obj) throws Exception {
+					return new NBTTagInt(obj.provider.dimensionId);
+				}
+				
+			};
+			setInstanceSerializerFor(World.class, ser);
+		}
+		{
 			DataSerializer ser = new DataSerializer<ItemStack>() {
 				@Override
 				public ItemStack readData(NBTBase nbt, ItemStack obj) throws Exception {
@@ -620,6 +639,25 @@ public class SerializationManager {
 				}
 			};
 			setDataSerializerFor(ItemStack.class, ser);
+		}
+		{
+			DataSerializer ser = new DataSerializer<Vec3>() {
+				@Override
+				public Vec3 readData(NBTBase nbt, Vec3 obj) throws Exception {
+					NBTTagCompound tag = (NBTTagCompound) nbt;
+					return Vec3.createVectorHelper(tag.getFloat("x"), tag.getFloat("y"), tag.getFloat("z"));
+				}
+
+				@Override
+				public NBTBase writeData(Vec3 obj) throws Exception {
+					NBTTagCompound nbt = new NBTTagCompound();
+					nbt.setFloat("x", (float) obj.xCoord);
+					nbt.setFloat("y", (float) obj.yCoord);
+					nbt.setFloat("z", (float) obj.zCoord);
+					return nbt;
+				}
+			};
+			setDataSerializerFor(Vec3.class, ser);
 		}
 		//network part
 		{

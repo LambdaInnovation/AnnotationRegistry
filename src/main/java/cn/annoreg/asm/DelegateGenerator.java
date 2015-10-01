@@ -22,10 +22,10 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
-import cpw.mods.fml.relauncher.Side;
 import cn.annoreg.mc.network.NetworkCallDelegate;
 import cn.annoreg.mc.network.NetworkCallManager;
 import cn.annoreg.mc.s11n.StorageOption;
+import cpw.mods.fml.relauncher.Side;
 
 public class DelegateGenerator {
     
@@ -157,6 +157,7 @@ public class DelegateGenerator {
             StorageOption.Option[] options = new StorageOption.Option[args.length];
             int targetIndex = -1;
             StorageOption.Target.RangeOption range = StorageOption.Target.RangeOption.SINGLE;
+            double sendRange = -1;
             
             {
                 for (int i = 0; i < options.length; ++i) {
@@ -193,6 +194,9 @@ public class DelegateGenerator {
                     if (!args[parameter].equals(Type.getType(EntityPlayer.class))) {
                         throw new RuntimeException("Target annotation can only be used on EntityPlayer.");
                     }
+                    if(targetIndex != -1) {
+                    	throw new RuntimeException("You can not specify multiple targets.");
+                    }
                     options[parameter] = StorageOption.Option.INSTANCE;
                     targetIndex = parameter;
                     return new AnnotationVisitor(this.api, super.visitParameterAnnotation(parameter, desc, visible)) {
@@ -202,6 +206,19 @@ public class DelegateGenerator {
                             range = StorageOption.Target.RangeOption.valueOf(value);
                         }
                     };
+                } else if(type.equals(Type.getType(StorageOption.RangedTarget.class))) {
+                	if(targetIndex != -1) {
+                    	throw new RuntimeException("You can not specify multiple targets.");
+                    }
+                	range = null;
+                	targetIndex = parameter;
+                	return new AnnotationVisitor(this.api, super.visitParameterAnnotation(parameter, desc, visible)) {
+                		@Override
+                	    public void visit(String name, Object value) {
+                			super.visit(name, value);
+                			sendRange = (double) value;
+                	    }
+                	};
                 }
                 return super.visitParameterAnnotation(parameter, desc, visible);
             }
@@ -216,7 +233,7 @@ public class DelegateGenerator {
                     Class<?> clazz = classLoader.defineClass(delegateClassType.getClassName(), cw.toByteArray());
                     NetworkCallDelegate delegateObj = (NetworkCallDelegate) clazz.newInstance(); 
                     if (side == Side.CLIENT) {
-                        NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex, range);
+                        NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex, range, sendRange);
                     } else {
                         NetworkCallManager.registerServerDelegateClass(delegateName, delegateObj, options);
                     }
@@ -231,7 +248,6 @@ public class DelegateGenerator {
         //}
     }
     
-
     public static MethodVisitor generateNonStaticMethod(ClassVisitor parentClass, MethodVisitor parent, 
             String className, String methodName, String desc, final Side side) {
         
@@ -348,6 +364,7 @@ public class DelegateGenerator {
             //Remember storage options for each argument
             StorageOption.Option[] options = new StorageOption.Option[args.length];
             int targetIndex = -1;
+            double sendRange = -1;
             StorageOption.Target.RangeOption range = StorageOption.Target.RangeOption.SINGLE;
             
             {
@@ -387,6 +404,9 @@ public class DelegateGenerator {
                     if (!args[parameter].equals(Type.getType(EntityPlayer.class))) {
                         throw new RuntimeException("Target annotation can only be used on EntityPlayer.");
                     }
+                    if(targetIndex != -1) {
+                    	throw new RuntimeException("You can not specify multiple targets.");
+                    }
                     options[parameter] = StorageOption.Option.INSTANCE;
                     targetIndex = parameter;
                     return new AnnotationVisitor(this.api, super.visitParameterAnnotation(parameter, desc, visible)) {
@@ -396,6 +416,19 @@ public class DelegateGenerator {
                             range = StorageOption.Target.RangeOption.valueOf(value);
                         }
                     };
+                } else if(type.equals(Type.getType(StorageOption.RangedTarget.class))) {
+                	if(targetIndex != -1) {
+                    	throw new RuntimeException("You can not specify multiple targets.");
+                    }
+                	targetIndex = parameter;
+                	range = null;
+                	return new AnnotationVisitor(this.api, super.visitParameterAnnotation(parameter, desc, visible)) {
+                		@Override
+                        public void visit(String name, Object value) {
+                            super.visit(name, value);
+                            sendRange = (double) value;
+                        }
+                	};
                 }
                 return super.visitParameterAnnotation(parameter, desc, visible);
             }
@@ -412,7 +445,7 @@ public class DelegateGenerator {
                     Class<?> clazz = classLoader.defineClass(delegateClassType.getClassName(), cw.toByteArray());
                     NetworkCallDelegate delegateObj = (NetworkCallDelegate) clazz.newInstance(); 
                     if (side == Side.CLIENT) {
-                        NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex, range);
+                        NetworkCallManager.registerClientDelegateClass(delegateName, delegateObj, options, targetIndex, range, sendRange);
                     } else {
                         NetworkCallManager.registerServerDelegateClass(delegateName, delegateObj, options);
                     }

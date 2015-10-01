@@ -18,15 +18,15 @@ import java.lang.annotation.RetentionPolicy;
 public class StorageOption {
 
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Null {
-        boolean nullable() default false;
-    }
+    public @interface Null {}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Data {}
 
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Instance {}
+	public @interface Instance {
+		boolean nullable() default false;
+	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Update {}
@@ -48,6 +48,11 @@ public class StorageOption {
         }
         
         RangeOption range() default RangeOption.SINGLE;
+    }
+    
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface RangedTarget {
+    	double range() default -1; //The hardcoded range option. The TargetPoint converter can choose to ignore this parameter.
     }
 	
 	public enum Option {
