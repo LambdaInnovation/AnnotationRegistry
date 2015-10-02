@@ -2,6 +2,9 @@ AnnotationRegistry
 ==================
 A core mod to allow annotation based registry in Minecraft mod.
 
+__WARNING:__ This respository is __DEPRECATED__. It is merged and maintained in our new project [LambdaLib](https://github.com/LambdaInnovation/LambdaLib).
+
+
 Build
 -----
 [![Build Status](https://travis-ci.org/LambdaInnovation/AnnotationRegistry.svg?branch=master)](https://travis-ci.org/LambdaInnovation/AnnotationRegistry)
